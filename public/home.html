@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home - Our Love</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="home-page">
+  <!-- Floating Particles -->
+  <div class="floating-particles" id="particles"></div>
+
+  <!-- Nyan Cat -->
+  <div id="nyan-cats-container"></div>
+
+  <!-- Settings Bar -->
+  <div class="settings-bar">
+    <button class="settings-btn" onclick="toggleSettings()">⚙️</button>
+    <button class="debug-btn" onclick="toggleDebugLog()" title="Debug Log">🐛</button>
+  </div>
+
+  <div class="settings-overlay" id="settings-overlay" onclick="closeSettings()"></div>
+
+  <div class="debug-log-panel" id="debug-log-panel">
+    <div class="debug-log-header">
+      <h3>🐛 Failed Login Attempts</h3>
+      <button class="close-debug" onclick="closeDebugLog()">✕</button>
+    </div>
+    <div class="debug-log-content" id="debug-log-content">
+      <p class="no-attempts">No failed attempts yet</p>
+    </div>
+    <button class="clear-debug-btn" onclick="clearFailedAttempts()">Clear Attempts</button>
+  </div>
+
+  <div class="settings-panel" id="settings-panel">
+    <button class="close-settings" onclick="closeSettings()">✕</button>
+    <h2>⚙️ Settings</h2>
+
+    <div class="settings-section">
+      <label class="settings-label">Theme</label>
+      <div class="theme-buttons">
+        <button class="theme-btn active" onclick="setTheme('default')">❤️ Red</button>
+        <button class="theme-btn" onclick="setTheme('blue')">💙 Blue</button>
+        <button class="theme-btn" onclick="setTheme('purple')">💜 Purple</button>
+        <button class="theme-btn" onclick="setTheme('green')">💚 Green</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <label class="settings-label">Inbox Background</label>
+      <div class="image-upload">
+        <input type="text" id="inbox-bg-url" placeholder="Image URL (paste link)">
+        <button class="add-btn" onclick="setInboxBackground()">Set Background 🖼️</button>
+        <button class="add-btn" onclick="clearInboxBackground()" style="background: linear-gradient(180deg, #ff9999 0%, #ff6666 100%);">Clear Background</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="home-container">
+    <div class="home-header">
+      <h1>💌 Welcome Home 💌</h1>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <nav class="home-nav">
+      <button class="nav-btn active" onclick="showSection('inbox')">💌 Inbox</button>
+      <button class="nav-btn" onclick="showSection('music')">🎵 Music</button>
+      <button class="nav-btn" onclick="showSection('gallery')">📸 Gallery</button>
+      <button class="nav-btn" onclick="showSection('notes')">📝 Notes</button>
+    </nav>
+
+    <div class="home-content">
+      <!-- Inbox Section -->
+      <div id="inbox-section" class="section active">
+        <h2>💌 Our Letters</h2>
+        <iframe src="inbox.html" class="section-iframe"></iframe>
+      </div>
+
+      <!-- Music Section -->
+      <div id="music-section" class="section">
+        <h2>🎵 Songs That Remind Us of Each Other</h2>
+        <div class="music-container">
+          <div id="music-list" class="music-list"></div>
+          <div class="add-music-form">
+            <h3>Add a Song</h3>
+            <input type="text" id="song-title" placeholder="Song title" required>
+            <input type="text" id="song-artist" placeholder="Artist name" required>
+            <textarea id="song-reason" placeholder="Why does this remind you of us?"></textarea>
+            <button onclick="addSong()" class="add-btn">Add Song 🎵</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gallery Section -->
+      <div id="gallery-section" class="section">
+        <h2>📸 Our Gallery</h2>
+        <div class="gallery-container">
+          <div id="gallery-grid" class="gallery-grid"></div>
+          <div class="add-image-form">
+            <h3>Add an Image</h3>
+            <input type="text" id="image-url" placeholder="Image URL" required>
+            <input type="text" id="image-title" placeholder="Title (optional)">
+            <input type="text" id="image-date" placeholder="Date (optional)">
+            <button onclick="addImage()" class="add-btn">Add Image 📸</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes Section -->
+      <div id="notes-section" class="section">
+        <h2>📝 Our Memories & Reminders</h2>
+        <div class="notes-container">
+          <div id="notes-list" class="notes-list"></div>
+          <div class="add-note-form">
+            <h3>Add a Memory or Reminder</h3>
+            <input type="text" id="note-title" placeholder="Title" required>
+            <textarea id="note-content" placeholder="Write your memory or reminder..." required></textarea>
+            <button onclick="addNote()" class="add-btn">Save Memory 💕</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="home.js"></script>
+</body>
+</html>

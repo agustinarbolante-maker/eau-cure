@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inbox - Love Letters</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="inbox-page">
+  <div class="inbox-container">
+    <div class="inbox-header">
+      <h1>💌 Inbox 💌</h1>
+      <a href="index.html" class="back-button">← Back</a>
+    </div>
+
+    <div class="inbox-main">
+      <div class="letters-section">
+        <h2>Letters</h2>
+        <div id="letters-list" class="letters-list">
+          <p class="loading">Loading letters...</p>
+        </div>
+      </div>
+
+      <div class="compose-section">
+        <h2>Write a Letter</h2>
+        <form id="letter-form">
+          <div class="form-group">
+            <label for="author">From:</label>
+            <input type="text" id="author" name="author" placeholder="Your name" required>
+          </div>
+
+          <div class="form-group">
+            <label for="content">Message:</label>
+            <textarea id="content" name="content" placeholder="Write your letter here..." rows="8" required></textarea>
+          </div>
+
+          <button type="submit" class="submit-button">Send Letter</button>
+          <p id="form-message" class="form-message"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="edit-modal" class="modal">
+    <div class="modal-content">
+      <h2>Edit Timestamp</h2>
+      <form id="edit-form">
+        <div class="form-group">
+          <label for="edit-timestamp">New Timestamp:</label>
+          <input type="datetime-local" id="edit-timestamp" name="edit-timestamp" required>
+        </div>
+        <div class="modal-buttons">
+          <button type="submit" class="modal-button submit-btn">Save</button>
+          <button type="button" class="modal-button cancel-btn" onclick="closeEditModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

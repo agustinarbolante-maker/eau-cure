@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "title": "Jane!",
+    "artist": "The Long Faces"
+  },
+  {
+    "id": 2,
+    "title": "505",
+    "artist": "Arctic Monkeys"
+  },
+  {
+    "id": 3,
+    "title": "Mrs Magic",
+    "artist": "Strawberry Guy"
+  },
+  {
+    "id": 4,
+    "title": "Beanie",
+    "artist": "Chezile"
+  },
+  {
+    "id": 5,
+    "title": "My Kind of Woman",
+    "artist": "Mac DeMarco"
+  },
+  {
+    "id": 6,
+    "title": "Apocalypse",
+    "artist": "CIGARETTES After Sex"
+  },
+  {
+    "id": 7,
+    "title": "Sienna",
+    "artist": "The Marias"
+  },
+  {
+    "id": 8,
+    "title": "Heart To Heart",
+    "artist": "Mac DeMarco"
+  },
+  {
+    "id": 9,
+    "title": "Heaven Knows I'm Miserable Now",
+    "artist": "The Smiths"
+  },
+  {
+    "id": 10,
+    "title": "Sweet",
+    "artist": "CIGARETTES After Sex"
+  },
+  {
+    "id": 11,
+    "title": "Sparks",
+    "artist": "Coldplay"
+  },
+  {
+    "id": 12,
+    "title": "Cry",
+    "artist": "CIGARETTES After Sex"
+  },
+  {
+    "id": 13,
+    "title": "For The First Time",
+    "artist": "Mac DeMarco"
+  },
+  {
+    "id": 14,
+    "title": "No One Noticed",
+    "artist": "The Marias"
+  },
+  {
+    "id": 15,
+    "title": "No Other Heart",
+    "artist": "Mac DeMarco"
+  },
+  {
+    "id": 16,
+    "title": "Good Looking",
+    "artist": "Suki Waterhouse"
+  },
+  {
+    "id": 17,
+    "title": "Iris",
+    "artist": "The Goo Goo Dolls"
+  },
+  {
+    "id": 18,
+    "title": "Self Aware",
+    "artist": "Temper City"
+  }
+]
