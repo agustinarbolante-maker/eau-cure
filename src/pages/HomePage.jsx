@@ -4,6 +4,7 @@ import InboxSection from '../components/InboxSection'
 import MusicSection from '../components/MusicSection'
 import WhySection from '../components/WhySection'
 import LetterDetail from '../components/LetterDetail'
+import { LETTERS, SONGS } from '../data/siteData'
 import '../styles/HomePage.css'
 
 const tabs = [
@@ -21,21 +22,9 @@ export default function HomePage() {
   const [selectedLetter, setSelectedLetter] = useState(null)
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [lettersRes, songsRes] = await Promise.all([
-          fetch('http://localhost:3000/api/letters'),
-          fetch('http://localhost:3000/api/songs'),
-        ])
-        if (lettersRes.ok) setLetters(await lettersRes.json())
-        if (songsRes.ok) setSongs(await songsRes.json())
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchData()
+    setLetters(LETTERS)
+    setSongs(SONGS)
+    setLoading(false)
   }, [])
 
   return (
