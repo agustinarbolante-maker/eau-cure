@@ -51,8 +51,6 @@ deliveryForm.addEventListener('submit', handleFormSubmit);
 editForm.addEventListener('submit', handleEditSubmit);
 closeModalBtn.addEventListener('click', closeEditModal);
 cancelEditBtn.addEventListener('click', closeEditModal);
-deliveryDate.addEventListener('change', updateDateDisplay);
-deliveryTime.addEventListener('change', updateDateDisplay);
 backupBtn.addEventListener('click', openBackupModal);
 closeBackupModalBtn.addEventListener('click', closeBackupModal);
 closeBackupModal2Btn.addEventListener('click', closeBackupModal);
