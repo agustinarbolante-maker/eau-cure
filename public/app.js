@@ -27,7 +27,7 @@ const filterStartDateInput = document.getElementById('filterStartDate');
 const filterEndDateInput = document.getElementById('filterEndDate');
 const exportBtn = document.getElementById('exportBtn');
 const printBtn = document.getElementById('printBtn');
-const settingsHeaderBtn = document.getElementById('settingsHeaderBtn');
+const settingsHeaderBtn = document.getElementById('settingsHeaderBtn') || {};
 const settingsModal = document.getElementById('settingsModal');
 const closeSettingsModalBtn = document.getElementById('closeSettingsModal');
 const closeSettingsModal2Btn = document.getElementById('closeSettingsModal2');
@@ -85,9 +85,11 @@ closeCompanyStatsModalBtn.addEventListener('click', closeCompanyStatsModal);
 closeCompanyStatsModal2Btn.addEventListener('click', closeCompanyStatsModal);
 exportBtn.addEventListener('click', exportToCSV);
 printBtn.addEventListener('click', printRecords);
-settingsHeaderBtn.addEventListener('click', openSettingsModal);
-closeSettingsModalBtn.addEventListener('click', closeSettingsModal);
-closeSettingsModal2Btn.addEventListener('click', closeSettingsModal);
+if (settingsHeaderBtn && settingsHeaderBtn.addEventListener) {
+  settingsHeaderBtn.addEventListener('click', openSettingsModal);
+}
+if (closeSettingsModalBtn) closeSettingsModalBtn.addEventListener('click', closeSettingsModal);
+if (closeSettingsModal2Btn) closeSettingsModal2Btn.addEventListener('click', closeSettingsModal);
 saveSettingsBtn.addEventListener('click', saveSettings);
 prevMonthBtn.addEventListener('click', () => {
   currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
@@ -1186,15 +1188,21 @@ function switchPage(pageName) {
   });
 
   // Show/hide sections based on page
-  document.getElementById('dashboardSection').style.display = pageName === 'dashboard' ? 'block' : 'none';
-  document.getElementById('filterSection').style.display = pageName === 'deliveries' ? 'block' : 'none';
-  document.querySelector('.calendar-section').style.display = pageName === 'dashboard' ? 'block' : 'none';
-  document.querySelector('.form-section').style.display = pageName === 'deliveries' ? 'block' : 'none';
-  document.querySelector('.table-section').style.display = pageName === 'deliveries' ? 'block' : 'none';
+  const dashboardSection = document.getElementById('dashboardSection');
+  const filterSection = document.querySelector('.filter-section');
+  const calendarSection = document.querySelector('.calendar-section');
+  const formSection = document.querySelector('.form-section');
+  const tableSection = document.querySelector('.table-section');
+
+  if (dashboardSection) dashboardSection.style.display = pageName === 'dashboard' ? 'block' : 'none';
+  if (filterSection) filterSection.style.display = pageName === 'deliveries' ? 'block' : 'none';
+  if (calendarSection) calendarSection.style.display = pageName === 'dashboard' ? 'block' : 'none';
+  if (formSection) formSection.style.display = pageName === 'deliveries' ? 'block' : 'none';
+  if (tableSection) tableSection.style.display = pageName === 'deliveries' ? 'block' : 'none';
 
   // Show company list for companies page
-  const companySection = document.createElement('div');
   if (pageName === 'companies') {
+    if (formSection) formSection.style.display = 'block';
     showCompanyList();
   }
 
