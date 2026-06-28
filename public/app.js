@@ -1194,24 +1194,73 @@ function switchPage(pageName) {
   const formSection = document.querySelector('.form-section');
   const tableSection = document.querySelector('.table-section');
 
+  // DASHBOARD: Only stats
   if (dashboardSection) dashboardSection.style.display = pageName === 'dashboard' ? 'block' : 'none';
+
+  // DELIVERIES: Calendar + Filters + Form + Table
   if (filterSection) filterSection.style.display = pageName === 'deliveries' ? 'block' : 'none';
-  if (calendarSection) calendarSection.style.display = pageName === 'dashboard' ? 'block' : 'none';
+  if (calendarSection) calendarSection.style.display = pageName === 'deliveries' ? 'block' : 'none';
   if (formSection) formSection.style.display = pageName === 'deliveries' ? 'block' : 'none';
   if (tableSection) tableSection.style.display = pageName === 'deliveries' ? 'block' : 'none';
 
-  // Show company list for companies page
+  // COMPANIES: Company list
   if (pageName === 'companies') {
     if (formSection) formSection.style.display = 'block';
     showCompanyList();
   }
 
-  // Show billing for billing page
+  // BILLING: Show billing history directly (no modal)
   if (pageName === 'billing') {
-    openBillingHistoryModal();
+    if (formSection) formSection.style.display = 'block';
+    showBillingPage();
   }
 
   console.log('Switched to page:', pageName);
+}
+
+async function showBillingPage() {
+  try {
+    const response = await fetch('/api/billing-statements');
+    if (!response.ok) throw new Error('Failed to load billing history');
+    const statements = await response.json();
+
+    let html = '<h2>📄 Billing Statements</h2>';
+    html += '<div style="margin-bottom: 20px;">';
+    html += '<button type="button" class="btn btn-billing" onclick="openBillingModal()">➕ Create New Billing Statement</button>';
+    html += '</div>';
+
+    if (statements.length === 0) {
+      html += '<p style="text-align: center; color: #999;">No billing statements yet. Create one to get started!</p>';
+    } else {
+      html += '<table style="width: 100%; border-collapse: collapse;">';
+      html += '<thead><tr style="background: #f0f0f0;"><th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Company</th><th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Period</th><th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Amount</th><th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Status</th><th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Action</th></tr></thead>';
+      html += '<tbody>';
+
+      statements.forEach(stmt => {
+        const startDate = new Date(stmt.start_date).toLocaleDateString();
+        const endDate = new Date(stmt.end_date).toLocaleDateString();
+        const statusClass = stmt.is_paid ? 'status-paid' : 'status-unpaid';
+        const statusText = stmt.is_paid ? 'PAID' : 'UNPAID';
+
+        html += '<tr style="border: 1px solid #ddd;">';
+        html += `<td style="padding: 12px; border: 1px solid #ddd;">${stmt.company_name}</td>`;
+        html += `<td style="padding: 12px; border: 1px solid #ddd;">${startDate} - ${endDate}</td>`;
+        html += `<td style="padding: 12px; border: 1px solid #ddd;">₱${parseFloat(stmt.total_amount).toFixed(2)}</td>`;
+        html += `<td style="padding: 12px; border: 1px solid #ddd;"><span class="status-badge ${statusClass}" onclick="togglePaidStatus(${stmt.id}, ${stmt.is_paid})" style="cursor: pointer;">${statusText}</span></td>`;
+        html += `<td style="padding: 12px; border: 1px solid #ddd;"><button class="btn btn-sm" onclick="deleteBillingStatement(${stmt.id})">Delete</button></td>`;
+        html += '</tr>';
+      });
+
+      html += '</tbody></table>';
+    }
+
+    const formSection = document.querySelector('.form-section');
+    if (formSection) {
+      formSection.innerHTML = html;
+    }
+  } catch (err) {
+    console.error('Error loading billing page:', err);
+  }
 }
 
 async function showCompanyList() {
