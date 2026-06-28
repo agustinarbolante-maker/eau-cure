@@ -1217,7 +1217,11 @@ function switchPage(pageName) {
     if (mainContent) mainContent.classList.add('deliveries-layout');
     if (filterSection) filterSection.style.display = 'none';
     if (calendarSection) calendarSection.style.display = 'block';
-    if (formSection) formSection.style.display = 'block';
+    if (formSection) {
+      formSection.style.display = 'block';
+      // Restore delivery form if it was overwritten
+      restoreDeliveryForm();
+    }
   }
 
   // RECORDS: Just the table with export/print buttons
@@ -1322,6 +1326,83 @@ function switchDashboardTab(tabName) {
 
   // Show/hide content based on tab
   console.log('Switched to tab:', tabName);
+}
+
+function restoreDeliveryForm() {
+  const formSection = document.querySelector('.form-section');
+  if (!formSection) return;
+
+  // Check if it's showing company list (has table content)
+  if (formSection.innerHTML.includes('Company Name') && formSection.innerHTML.includes('Unit Price')) {
+    // Re-render the delivery form
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+    formSection.innerHTML = `
+      <h2>📝 New Delivery Entry</h2>
+      <div class="date-picker-section">
+        <span class="form-selected-date">Adding for: <strong id="formDateDisplay">Today</strong></span>
+        <input type="time" id="deliveryTime" value="09:00" required style="display: none;">
+      </div>
+
+      <form id="deliveryForm">
+        <div class="form-group">
+          <label for="company">Company Delivered:</label>
+          <select id="company" name="company" required>
+            <option value="">-- Select a Company --</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="bottlesDelivered">Number of Bottles Delivered:</label>
+          <input type="number" id="bottlesDelivered" name="bottlesDelivered" min="0" required>
+        </div>
+
+        <div class="form-group">
+          <label for="bottlesReturned">Number of Bottles Returned:</label>
+          <input type="number" id="bottlesReturned" name="bottlesReturned" min="0" required>
+        </div>
+
+        <div class="form-group">
+          <label for="drNumber">DR Number:</label>
+          <input type="text" id="drNumber" name="drNumber" required>
+        </div>
+
+        <button type="submit" class="btn btn-submit">Add Delivery</button>
+      </form>
+      <div id="formMessage" class="form-message"></div>
+    `;
+
+    // Re-attach event listeners
+    const deliveryForm = document.getElementById('deliveryForm');
+    const companySelect = document.getElementById('company');
+
+    if (deliveryForm) {
+      deliveryForm.removeEventListener('submit', handleFormSubmit);
+      deliveryForm.addEventListener('submit', handleFormSubmit);
+    }
+
+    if (companySelect) {
+      companySelect.innerHTML = '<option value="">-- Select a Company --</option>';
+      companies.forEach(company => {
+        const option = document.createElement('option');
+        option.value = company;
+        option.textContent = company;
+        companySelect.appendChild(option);
+      });
+    }
+
+    // Update form date display
+    const formDateDisplay = document.getElementById('formDateDisplay');
+    if (formDateDisplay) {
+      const selectedDate = new Date(selectedDateForDeliveries);
+      formDateDisplay.textContent = selectedDate.toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+  }
 }
 
 // Initialize page to show dashboard by default
