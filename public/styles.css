@@ -74,16 +74,20 @@ body {
   font-size: 14px;
 }
 
-.form-group input {
+.form-group input,
+.form-group select {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid #dee2e6;
   border-radius: 5px;
   font-size: 14px;
   transition: border-color 0.3s;
+  font-family: inherit;
+  background-color: white;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);

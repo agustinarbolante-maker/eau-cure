@@ -19,7 +19,9 @@
         <form id="deliveryForm">
           <div class="form-group">
             <label for="company">Company Delivered:</label>
-            <input type="text" id="company" name="company" required>
+            <select id="company" name="company" required>
+              <option value="">-- Select a Company --</option>
+            </select>
           </div>
 
           <div class="form-group">
@@ -78,7 +80,9 @@
         <input type="hidden" id="editId">
         <div class="form-group">
           <label for="editCompany">Company Delivered:</label>
-          <input type="text" id="editCompany" required>
+          <select id="editCompany" required>
+            <option value="">-- Select a Company --</option>
+          </select>
         </div>
         <div class="form-group">
           <label for="editBottlesDelivered">Number of Bottles Delivered:</label>

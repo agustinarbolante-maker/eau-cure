@@ -11,6 +11,15 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/api/companies', (req, res) => {
+  try {
+    const companies = db.getCompanies();
+    res.json(companies);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/deliveries', async (req, res) => {
   try {
     const deliveries = await db.getAllDeliveries();

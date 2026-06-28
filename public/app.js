@@ -1,5 +1,7 @@
 const API_URL = '/api/deliveries';
+const COMPANIES_API = '/api/companies';
 let deliveries = [];
+let companies = [];
 let editingId = null;
 
 const deliveryForm = document.getElementById('deliveryForm');
@@ -9,11 +11,33 @@ const editModal = document.getElementById('editModal');
 const editForm = document.getElementById('editForm');
 const closeModalBtn = document.getElementById('closeModal');
 const cancelEditBtn = document.getElementById('cancelEdit');
+const companySelect = document.getElementById('company');
+const editCompanySelect = document.getElementById('editCompany');
 
 deliveryForm.addEventListener('submit', handleFormSubmit);
 editForm.addEventListener('submit', handleEditSubmit);
 closeModalBtn.addEventListener('click', closeEditModal);
 cancelEditBtn.addEventListener('click', closeEditModal);
+
+async function fetchCompanies() {
+  try {
+    const response = await fetch(COMPANIES_API);
+    if (!response.ok) throw new Error('Failed to fetch companies');
+    companies = await response.json();
+    populateCompanyDropdowns();
+  } catch (err) {
+    console.error('Error loading companies:', err);
+  }
+}
+
+function populateCompanyDropdowns() {
+  const options = companies.map(company =>
+    `<option value="${company}">${company}</option>`
+  ).join('');
+
+  companySelect.innerHTML = '<option value="">-- Select a Company --</option>' + options;
+  editCompanySelect.innerHTML = '<option value="">-- Select a Company --</option>' + options;
+}
 
 async function fetchDeliveries() {
   try {
@@ -143,4 +167,5 @@ function showMessage(msg, type) {
   }, 3000);
 }
 
+fetchCompanies();
 fetchDeliveries();
