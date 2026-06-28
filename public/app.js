@@ -729,39 +729,33 @@ function renderBillingStatement(data) {
 
   html += `<table class="billing-table">`;
   html += `<thead><tr>`;
-  html += `<th>Date</th><th>DR Number</th><th>Delivered</th><th>Returned</th><th>Net</th><th>Amount</th>`;
+  html += `<th>Date</th><th>DR Number</th><th>Particulars</th><th>Quantity</th><th>Unit Price</th><th>Amount</th>`;
   html += `</tr></thead><tbody>`;
 
-  let totalDelivered = 0, totalReturned = 0, totalAmount = 0;
+  let totalQuantity = 0, totalAmount = 0;
 
   deliveries.forEach(delivery => {
     const date = new Date(delivery.timestamp).toLocaleDateString();
-    const delivered = parseInt(delivery.bottles_delivered) || 0;
-    const returned = parseInt(delivery.bottles_returned) || 0;
-    const net = delivered - returned;
-    const amount = net * price;
+    const quantity = parseInt(delivery.bottles_delivered) || 0;
+    const amount = quantity * price;
 
-    totalDelivered += delivered;
-    totalReturned += returned;
+    totalQuantity += quantity;
     totalAmount += amount;
 
     html += `<tr>`;
     html += `<td>${date}</td>`;
     html += `<td>${delivery.dr_number}</td>`;
-    html += `<td>${delivered}</td>`;
-    html += `<td>${returned}</td>`;
-    html += `<td>${net}</td>`;
+    html += `<td>5 gal round</td>`;
+    html += `<td>${quantity}</td>`;
+    html += `<td>₱${price.toFixed(2)}</td>`;
     html += `<td>₱${amount.toFixed(2)}</td>`;
     html += `</tr>`;
   });
 
   html += `</tbody></table>`;
 
-  const totalNet = totalDelivered - totalReturned;
   html += `<div class="billing-summary">`;
-  html += `<div class="billing-summary-row"><span>Total Delivered:</span><span>${totalDelivered} bottles</span></div>`;
-  html += `<div class="billing-summary-row"><span>Total Returned:</span><span>${totalReturned} bottles</span></div>`;
-  html += `<div class="billing-summary-row"><span>Total Net:</span><span>${totalNet} bottles</span></div>`;
+  html += `<div class="billing-summary-row"><span>Total Quantity:</span><span>${totalQuantity} bottles</span></div>`;
   html += `<div class="billing-summary-row"><span>Unit Price:</span><span>₱${price.toFixed(2)}</span></div>`;
   html += `<div class="billing-summary-row total"><span>TOTAL AMOUNT DUE:</span><span>₱${totalAmount.toFixed(2)}</span></div>`;
   html += `</div>`;
