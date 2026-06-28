@@ -70,6 +70,7 @@
           <button type="button" class="btn btn-reset" onclick="resetFilters()">Reset Filters</button>
           <button type="button" class="btn btn-stats" onclick="openCompanyStatsModal()">📈 Company Stats</button>
           <button type="button" class="btn btn-billing" onclick="openBillingModal()">📄 Billing Statement</button>
+          <button type="button" class="btn btn-daily" onclick="openDailyReportModal()">📋 Daily Report</button>
           <button type="button" class="btn btn-add-company" onclick="openAddCompanyModal()">➕ Add Company</button>
         </div>
       </section>
@@ -300,6 +301,27 @@
         <button type="button" class="btn btn-print" id="printBillingBtn" style="display: none;">🖨️ Print</button>
         <button type="button" class="btn btn-submit" id="downloadBillingPdfBtn" style="display: none;">📥 Download PDF</button>
         <button type="button" class="btn btn-cancel" id="closeBillingModal2">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="dailyReportModal" class="modal hidden">
+    <div class="modal-content modal-wide">
+      <div class="modal-header">
+        <h2>Daily Delivery Report</h2>
+        <button type="button" class="modal-close" id="closeDailyReportModal">&times;</button>
+      </div>
+      <div class="daily-report-controls">
+        <div class="form-group">
+          <label for="reportDate">Select Date:</label>
+          <input type="date" id="reportDate" required>
+        </div>
+      </div>
+      <div id="dailyReportContent" class="daily-report-content"></div>
+      <div class="modal-buttons">
+        <button type="button" class="btn btn-print" id="printDailyReportBtn" style="display: none;">🖨️ Print</button>
+        <button type="button" class="btn btn-submit" id="downloadDailyReportBtn" style="display: none;">📥 Download</button>
+        <button type="button" class="btn btn-cancel" id="closeDailyReportModal2">Close</button>
       </div>
     </div>
   </div>

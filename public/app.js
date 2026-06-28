@@ -56,6 +56,13 @@ const closeAddCompanyModalBtn = document.getElementById('closeAddCompanyModal');
 const closeAddCompanyModal2Btn = document.getElementById('closeAddCompanyModal2');
 const addCompanyForm = document.getElementById('addCompanyForm');
 const addCompanyMessage = document.getElementById('addCompanyMessage');
+const dailyReportModal = document.getElementById('dailyReportModal');
+const closeDailyReportModalBtn = document.getElementById('closeDailyReportModal');
+const closeDailyReportModal2Btn = document.getElementById('closeDailyReportModal2');
+const reportDateInput = document.getElementById('reportDate');
+const dailyReportContent = document.getElementById('dailyReportContent');
+const printDailyReportBtn = document.getElementById('printDailyReportBtn');
+const downloadDailyReportBtn = document.getElementById('downloadDailyReportBtn');
 
 let currentCalendarDate = new Date();
 let selectedDateForDeliveries = new Date();
@@ -94,6 +101,11 @@ downloadBillingPdfBtn.addEventListener('click', downloadBillingPdf);
 billingCompanySelect.addEventListener('change', generateBillingStatement);
 billingStartDateInput.addEventListener('change', generateBillingStatement);
 billingEndDateInput.addEventListener('change', generateBillingStatement);
+closeDailyReportModalBtn.addEventListener('click', closeDailyReportModal);
+closeDailyReportModal2Btn.addEventListener('click', closeDailyReportModal);
+reportDateInput.addEventListener('change', generateDailyReport);
+printDailyReportBtn.addEventListener('click', printDailyReport);
+downloadDailyReportBtn.addEventListener('click', downloadDailyReport);
 
 async function fetchCompanies() {
   try {
@@ -896,6 +908,140 @@ async function submitAddCompany() {
   } catch (err) {
     addCompanyMessage.innerHTML = `<span style="color: #dc3545;">Error: ${err.message}</span>`;
   }
+}
+
+function openDailyReportModal() {
+  dailyReportModal.classList.remove('hidden');
+  reportDateInput.value = new Date().toISOString().split('T')[0];
+  dailyReportContent.innerHTML = '';
+  printDailyReportBtn.style.display = 'none';
+  downloadDailyReportBtn.style.display = 'none';
+}
+
+function closeDailyReportModal() {
+  dailyReportModal.classList.add('hidden');
+  dailyReportContent.innerHTML = '';
+  printDailyReportBtn.style.display = 'none';
+  downloadDailyReportBtn.style.display = 'none';
+}
+
+async function generateDailyReport() {
+  const date = reportDateInput.value;
+  if (!date) {
+    showMessage('Please select a date', 'error');
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/deliveries?startDate=${date}&endDate=${date}`);
+    if (!response.ok) throw new Error('Failed to fetch daily deliveries');
+    const deliveries = await response.json();
+
+    renderDailyReport(date, deliveries);
+    printDailyReportBtn.style.display = 'inline-block';
+    downloadDailyReportBtn.style.display = 'inline-block';
+  } catch (err) {
+    showMessage('Error: ' + err.message, 'error');
+  }
+}
+
+function renderDailyReport(date, allDeliveries) {
+  const reportDate = new Date(date);
+  const dateFormatted = reportDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+  const companiesData = {};
+  let totalBottles = 0;
+
+  allDeliveries.forEach(delivery => {
+    if (!companiesData[delivery.company]) {
+      companiesData[delivery.company] = { quantity: 0, drNumbers: [] };
+    }
+    companiesData[delivery.company].quantity += delivery.bottles_delivered;
+    companiesData[delivery.company].drNumbers.push(delivery.dr_number);
+    totalBottles += delivery.bottles_delivered;
+  });
+
+  const companies = Object.keys(companiesData).sort();
+
+  let html = `<h3 style="text-align: center; margin-bottom: 20px; color: #dc3545;">DAILY DELIVERY REPORT</h3>`;
+  html += `<div style="font-size: 13px; margin-bottom: 15px;">`;
+  html += `<p><strong>Date:</strong> ${dateFormatted}</p>`;
+  html += `<p><strong>Total Companies:</strong> ${companies.length}</p>`;
+  html += `</div>`;
+
+  if (companies.length === 0) {
+    html += `<p style="text-align: center; color: #999;">No deliveries found for this date</p>`;
+    dailyReportContent.innerHTML = html;
+    return;
+  }
+
+  html += `<table class="daily-report-table">`;
+  html += `<thead><tr>`;
+  html += `<th>Company</th><th>Bottles Delivered</th><th>DR Numbers</th>`;
+  html += `</tr></thead><tbody>`;
+
+  companies.forEach(company => {
+    const data = companiesData[company];
+    html += `<tr>`;
+    html += `<td>${company}</td>`;
+    html += `<td style="color: #dc3545; font-weight: 600;">${data.quantity}</td>`;
+    html += `<td>${data.drNumbers.join(', ')}</td>`;
+    html += `</tr>`;
+  });
+
+  html += `</tbody></table>`;
+
+  html += `<div class="daily-report-summary">`;
+  html += `<div class="daily-report-summary-row"><span>Total Companies Served:</span><span>${companies.length}</span></div>`;
+  html += `<div class="daily-report-summary-row total"><span>TOTAL BOTTLES DELIVERED:</span><span>${totalBottles}</span></div>`;
+  html += `</div>`;
+
+  dailyReportContent.innerHTML = html;
+}
+
+function printDailyReport() {
+  window.print();
+}
+
+function downloadDailyReport() {
+  const date = reportDateInput.value;
+  const reportDate = new Date(date);
+  const dateFormatted = reportDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const content = dailyReportContent.innerHTML;
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Daily Report - ${date}</title>
+      <meta charset="UTF-8">
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; padding: 40px 20px; color: #000; }
+        h3 { text-align: center; margin-bottom: 30px; font-size: 24px; color: #dc3545; font-weight: bold; }
+        .info { margin-bottom: 20px; font-size: 13px; line-height: 1.6; }
+        .info p { margin-bottom: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; font-size: 12px; }
+        th { background: #f0f0f0; border: 1px solid #000; padding: 8px; text-align: left; font-weight: bold; color: #000; }
+        td { border: 1px solid #000; padding: 8px; color: #000; }
+        .daily-report-summary { margin-top: 20px; }
+        .daily-report-summary > div { padding: 10px 0; display: flex; justify-content: space-between; font-size: 13px; }
+        .daily-report-summary > div.total { border-top: 2px solid #000; padding-top: 15px; font-weight: bold; font-size: 14px; color: #dc3545; }
+      </style>
+    </head>
+    <body>
+      ${content}
+    </body>
+    </html>
+  `;
+
+  const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `daily_report_${date}.html`;
+  a.click();
+  window.URL.revokeObjectURL(url);
 }
 
 const today = new Date();

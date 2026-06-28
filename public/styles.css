@@ -221,6 +221,7 @@ body {
 }
 
 .btn-billing,
+.btn-daily,
 .btn-add-company {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -229,9 +230,75 @@ body {
 }
 
 .btn-billing:hover,
+.btn-daily:hover,
 .btn-add-company:hover {
   background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
   transform: translateY(-2px);
+}
+
+.daily-report-controls {
+  margin-bottom: 20px;
+}
+
+.daily-report-controls .form-group {
+  max-width: 250px;
+  margin-bottom: 0;
+}
+
+.daily-report-content {
+  margin: 20px 0;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.daily-report-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 13px;
+}
+
+.daily-report-table th {
+  background: #f0f0f0;
+  border: 1px solid #000;
+  padding: 10px;
+  text-align: left;
+  font-weight: bold;
+  color: #000;
+}
+
+.daily-report-table td {
+  border: 1px solid #000;
+  padding: 10px;
+  color: #000;
+}
+
+.daily-report-summary {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-top: 20px;
+}
+
+.daily-report-summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+  font-size: 13px;
+}
+
+.daily-report-summary-row:last-child {
+  border-bottom: none;
+}
+
+.daily-report-summary-row.total {
+  font-weight: bold;
+  font-size: 14px;
+  color: #dc3545;
+  border-top: 2px solid #000;
+  padding-top: 15px;
 }
 
 .form-section h2,
@@ -1261,10 +1328,72 @@ tbody tr:hover {
     font-size: 16px;
   }
 
+  .daily-report-content h3 {
+    text-align: center;
+    margin: 20px 0 30px 0;
+    font-size: 24px;
+    color: #dc3545;
+    font-weight: bold;
+  }
+
+  .daily-report-content div > p {
+    margin-bottom: 5px;
+    font-size: 13px;
+    color: #000;
+  }
+
+  .daily-report-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 12px;
+  }
+
+  .daily-report-table th {
+    background: #f0f0f0 !important;
+    border: 1px solid #000 !important;
+    padding: 8px !important;
+    text-align: left;
+    font-weight: bold;
+    color: #000 !important;
+  }
+
+  .daily-report-table td {
+    border: 1px solid #000 !important;
+    padding: 8px !important;
+    color: #000 !important;
+  }
+
+  .daily-report-summary {
+    margin-top: 20px;
+    padding: 0;
+    background: white !important;
+    border: none !important;
+  }
+
+  .daily-report-summary > div {
+    padding: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #000;
+  }
+
+  .daily-report-summary > div.total {
+    border-top: 2px solid #000 !important;
+    padding-top: 15px;
+    font-weight: bold;
+    font-size: 14px;
+    color: #dc3545;
+  }
+
   .modal-buttons,
   #printBillingBtn,
   #downloadBillingPdfBtn,
-  #closeBillingModal2 {
+  #closeBillingModal2,
+  #printDailyReportBtn,
+  #downloadDailyReportBtn,
+  #closeDailyReportModal2 {
     display: none !important;
   }
 
