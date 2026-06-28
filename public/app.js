@@ -1253,7 +1253,10 @@ async function togglePaidStatus(id, currentStatus) {
 
     if (!response.ok) throw new Error('Failed to update status');
     showMessage('Status updated successfully!', 'success');
+
+    // Update both modal and page view
     loadBillingHistory();
+    showBillingPage();
   } catch (err) {
     showMessage('Error: ' + err.message, 'error');
   }
@@ -1271,7 +1274,10 @@ async function deleteBillingStatement(id) {
 
     if (!response.ok) throw new Error('Failed to delete statement');
     showMessage('Billing statement deleted!', 'success');
+
+    // Update both modal and page view
     loadBillingHistory();
+    showBillingPage();
   } catch (err) {
     showMessage('Error: ' + err.message, 'error');
   }
