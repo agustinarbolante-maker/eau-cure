@@ -1212,10 +1212,10 @@ function switchPage(pageName) {
     if (dashboardSection) dashboardSection.style.display = 'block';
   }
 
-  // DELIVERIES: Calendar + Filters + Form (NO TABLE)
+  // DELIVERIES: Calendar + Form (NO FILTERS, NO TABLE)
   if (pageName === 'deliveries') {
     if (mainContent) mainContent.classList.add('deliveries-layout');
-    if (filterSection) filterSection.style.display = 'block';
+    if (filterSection) filterSection.style.display = 'none';
     if (calendarSection) calendarSection.style.display = 'block';
     if (formSection) formSection.style.display = 'block';
   }

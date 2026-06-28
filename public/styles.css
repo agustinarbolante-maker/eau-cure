@@ -559,10 +559,10 @@ body {
 
 .form-section {
   padding: 40px !important;
+  background: white;
 }
 
-.form-section h2,
-.table-section h2 {
+.form-section h2 {
   color: #1a1a1a;
   margin-bottom: 28px;
   font-size: 22px;
@@ -570,6 +570,14 @@ body {
   border-bottom: none;
   padding-bottom: 0;
   letter-spacing: -0.5px;
+}
+
+.table-section h2 {
+  color: #667eea;
+  margin-bottom: 20px;
+  font-size: 20px;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 10px;
 }
 
 .date-picker-section {
