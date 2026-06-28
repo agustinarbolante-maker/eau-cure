@@ -59,13 +59,13 @@ app.get('/api/stats/companies', async (req, res) => {
 
 app.post('/api/deliveries', async (req, res) => {
   try {
-    const { company, bottlesDelivered, bottlesReturned, drNumber } = req.body;
-    
+    const { company, bottlesDelivered, bottlesReturned, drNumber, timestamp } = req.body;
+
     if (!company || bottlesDelivered === undefined || bottlesReturned === undefined || !drNumber) {
       return res.status(400).json({ error: 'All fields are required' });
     }
-    
-    const id = await db.addDelivery(company, bottlesDelivered, bottlesReturned, drNumber);
+
+    const id = await db.addDelivery(company, bottlesDelivered, bottlesReturned, drNumber, timestamp);
     res.json({ id, message: 'Delivery added successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });

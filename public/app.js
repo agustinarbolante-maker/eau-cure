@@ -35,11 +35,16 @@ const saveSettingsBtn = document.getElementById('saveSettingsBtn');
 const settingsDefaultCompany = document.getElementById('settingsDefaultCompany');
 const settingsRowsPerPage = document.getElementById('settingsRowsPerPage');
 const settingsAutoRefresh = document.getElementById('settingsAutoRefresh');
+const deliveryDate = document.getElementById('deliveryDate');
+const deliveryTime = document.getElementById('deliveryTime');
+const selectedDateDisplay = document.getElementById('selectedDateDisplay');
 
 deliveryForm.addEventListener('submit', handleFormSubmit);
 editForm.addEventListener('submit', handleEditSubmit);
 closeModalBtn.addEventListener('click', closeEditModal);
 cancelEditBtn.addEventListener('click', closeEditModal);
+deliveryDate.addEventListener('change', updateDateDisplay);
+deliveryTime.addEventListener('change', updateDateDisplay);
 backupBtn.addEventListener('click', openBackupModal);
 closeBackupModalBtn.addEventListener('click', closeBackupModal);
 closeBackupModal2Btn.addEventListener('click', closeBackupModal);
@@ -93,19 +98,30 @@ async function handleFormSubmit(e) {
   const bottlesDelivered = parseInt(document.getElementById('bottlesDelivered').value);
   const bottlesReturned = parseInt(document.getElementById('bottlesReturned').value);
   const drNumber = document.getElementById('drNumber').value;
+  const date = deliveryDate.value;
+  const time = deliveryTime.value;
+
+  if (!date || !time) {
+    showMessage('Please select a date and time', 'error');
+    return;
+  }
+
+  const timestamp = new Date(`${date}T${time}:00`).toISOString();
 
   try {
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ company, bottlesDelivered, bottlesReturned, drNumber })
+      body: JSON.stringify({ company, bottlesDelivered, bottlesReturned, drNumber, timestamp })
     });
 
     if (!response.ok) throw new Error('Failed to add delivery');
 
     showMessage('Delivery added successfully!', 'success');
     deliveryForm.reset();
+    resetDatePicker();
     fetchDeliveries();
+    loadStats();
   } catch (err) {
     showMessage('Error: ' + err.message, 'error');
   }
@@ -128,6 +144,27 @@ function openEditModal(id) {
 function closeEditModal() {
   editModal.classList.add('hidden');
   editingId = null;
+}
+
+function updateDateDisplay() {
+  const date = deliveryDate.value;
+  if (!date) {
+    selectedDateDisplay.textContent = 'Select a date';
+    return;
+  }
+
+  const dateObj = new Date(date + 'T00:00:00');
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  const formatted = dateObj.toLocaleDateString('en-US', options);
+  const time = deliveryTime.value;
+  selectedDateDisplay.textContent = `${formatted} at ${time}`;
+}
+
+function resetDatePicker() {
+  const today = new Date().toISOString().split('T')[0];
+  deliveryDate.value = today;
+  deliveryTime.value = '09:00';
+  updateDateDisplay();
 }
 
 async function handleEditSubmit(e) {
@@ -532,6 +569,8 @@ function saveSettings() {
   Swal.fire('Saved!', 'Settings saved successfully.', 'success');
   closeSettingsModal();
 }
+
+resetDatePicker();
 
 fetchCompanies();
 fetchDeliveries();

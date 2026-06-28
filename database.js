@@ -59,11 +59,12 @@ function getAllDeliveries() {
   });
 }
 
-function addDelivery(company, bottlesDelivered, bottlesReturned, drNumber) {
+function addDelivery(company, bottlesDelivered, bottlesReturned, drNumber, timestamp) {
   return new Promise((resolve, reject) => {
+    const finalTimestamp = timestamp || new Date().toISOString();
     db.run(
-      'INSERT INTO deliveries (company, bottles_delivered, bottles_returned, dr_number) VALUES (?, ?, ?, ?)',
-      [company, bottlesDelivered, bottlesReturned, drNumber],
+      'INSERT INTO deliveries (company, bottles_delivered, bottles_returned, dr_number, timestamp) VALUES (?, ?, ?, ?, ?)',
+      [company, bottlesDelivered, bottlesReturned, drNumber, finalTimestamp],
       function(err) {
         if (err) reject(err);
         else resolve(this.lastID);

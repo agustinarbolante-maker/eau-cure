@@ -73,7 +73,14 @@
       </section>
 
       <section class="form-section">
-        <h2>New Delivery Entry</h2>
+        <h2>📅 New Delivery Entry</h2>
+        <div class="date-picker-section">
+          <label for="deliveryDate">Select Date:</label>
+          <input type="date" id="deliveryDate" required>
+          <input type="time" id="deliveryTime" value="09:00" required>
+          <span class="selected-date" id="selectedDateDisplay">Today</span>
+        </div>
+
         <form id="deliveryForm">
           <div class="form-group">
             <label for="company">Company Delivered:</label>

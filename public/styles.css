@@ -219,6 +219,41 @@ body {
   padding-bottom: 10px;
 }
 
+.date-picker-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.date-picker-section label {
+  color: white;
+  font-weight: 600;
+  margin: 0;
+  font-size: 14px;
+}
+
+.date-picker-section input {
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.selected-date {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 12px;
+  border-radius: 5px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -713,6 +748,24 @@ tbody tr:hover {
 
   .stats-grid {
     grid-template-columns: 1fr;
+  }
+
+  .date-picker-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .date-picker-section label {
+    width: 100%;
+  }
+
+  .date-picker-section input {
+    width: 100%;
+  }
+
+  .selected-date {
+    width: 100%;
+    text-align: center;
   }
 }
 
