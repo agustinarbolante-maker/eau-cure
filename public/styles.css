@@ -401,6 +401,25 @@ body.theme-green {
   animation: shake 0.4s ease;
 }
 
+.encouragement {
+  margin-top: 25px;
+  color: #00ff00;
+  font-size: 14px;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 0 10px #00ff00;
+  animation: blink 1s ease-in-out infinite;
+}
+
+.no-cheat {
+  margin-top: 8px;
+  color: #ffaa00;
+  font-size: 12px;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 0 8px #ffaa00;
+  font-style: italic;
+  opacity: 0.8;
+}
+
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-10px); }
