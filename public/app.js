@@ -712,11 +712,13 @@ async function generateBillingStatement() {
 function renderBillingStatement(data) {
   const { company, unitPrice, deliveries, startDate, endDate } = data;
 
+  const price = parseFloat(unitPrice) || 0;
+
   let html = `<h3 style="text-align: center; margin-bottom: 20px;">Billing Statement</h3>`;
   html += `<div style="font-size: 13px; margin-bottom: 15px;">`;
   html += `<p><strong>Company:</strong> ${company}</p>`;
   html += `<p><strong>Period:</strong> ${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}</p>`;
-  html += `<p><strong>Unit Price:</strong> ₱${unitPrice.toFixed(2)} per bottle</p>`;
+  html += `<p><strong>Unit Price:</strong> ₱${price.toFixed(2)} per bottle</p>`;
   html += `</div>`;
 
   if (deliveries.length === 0) {
@@ -734,18 +736,20 @@ function renderBillingStatement(data) {
 
   deliveries.forEach(delivery => {
     const date = new Date(delivery.timestamp).toLocaleDateString();
-    const net = delivery.bottles_delivered - delivery.bottles_returned;
-    const amount = net * unitPrice;
+    const delivered = parseInt(delivery.bottles_delivered) || 0;
+    const returned = parseInt(delivery.bottles_returned) || 0;
+    const net = delivered - returned;
+    const amount = net * price;
 
-    totalDelivered += delivery.bottles_delivered;
-    totalReturned += delivery.bottles_returned;
+    totalDelivered += delivered;
+    totalReturned += returned;
     totalAmount += amount;
 
     html += `<tr>`;
     html += `<td>${date}</td>`;
     html += `<td>${delivery.dr_number}</td>`;
-    html += `<td>${delivery.bottles_delivered}</td>`;
-    html += `<td>${delivery.bottles_returned}</td>`;
+    html += `<td>${delivered}</td>`;
+    html += `<td>${returned}</td>`;
     html += `<td>${net}</td>`;
     html += `<td>₱${amount.toFixed(2)}</td>`;
     html += `</tr>`;
@@ -755,11 +759,11 @@ function renderBillingStatement(data) {
 
   const totalNet = totalDelivered - totalReturned;
   html += `<div class="billing-summary">`;
-  html += `<div class="billing-summary-row"><span>Total Delivered:</span><span>${totalDelivered}</span></div>`;
-  html += `<div class="billing-summary-row"><span>Total Returned:</span><span>${totalReturned}</span></div>`;
-  html += `<div class="billing-summary-row"><span>Total Net:</span><span>${totalNet}</span></div>`;
-  html += `<div class="billing-summary-row"><span>Unit Price:</span><span>₱${unitPrice.toFixed(2)}</span></div>`;
-  html += `<div class="billing-summary-row total"><span>TOTAL AMOUNT:</span><span>₱${totalAmount.toFixed(2)}</span></div>`;
+  html += `<div class="billing-summary-row"><span>Total Delivered:</span><span>${totalDelivered} bottles</span></div>`;
+  html += `<div class="billing-summary-row"><span>Total Returned:</span><span>${totalReturned} bottles</span></div>`;
+  html += `<div class="billing-summary-row"><span>Total Net:</span><span>${totalNet} bottles</span></div>`;
+  html += `<div class="billing-summary-row"><span>Unit Price:</span><span>₱${price.toFixed(2)}</span></div>`;
+  html += `<div class="billing-summary-row total"><span>TOTAL AMOUNT DUE:</span><span>₱${totalAmount.toFixed(2)}</span></div>`;
   html += `</div>`;
 
   billingContent.innerHTML = html;
