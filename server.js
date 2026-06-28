@@ -98,6 +98,37 @@ app.delete('/api/deliveries/:id', async (req, res) => {
   }
 });
 
+app.get('/api/deliveries/export/csv', async (req, res) => {
+  try {
+    const { company, startDate, endDate } = req.query;
+
+    let deliveries;
+    if (company || startDate || endDate) {
+      deliveries = await db.getDeliveriesByFilters(company, startDate, endDate);
+    } else {
+      deliveries = await db.getAllDeliveries();
+    }
+
+    const csv = [
+      ['ID', 'Company', 'Bottles Delivered', 'Bottles Returned', 'DR Number', 'Timestamp'].join(','),
+      ...deliveries.map(d => [
+        d.id,
+        `"${d.company}"`,
+        d.bottles_delivered,
+        d.bottles_returned,
+        `"${d.dr_number}"`,
+        new Date(d.timestamp).toLocaleString()
+      ].join(','))
+    ].join('\n');
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="deliveries_' + new Date().toISOString().split('T')[0] + '.csv"');
+    res.send(csv);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/backups', async (req, res) => {
   try {
     const backups = await db.listBackups();

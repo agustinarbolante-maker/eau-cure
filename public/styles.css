@@ -25,7 +25,15 @@ body {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   padding: 40px 20px;
-  text-align: center;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .header h1 {
@@ -36,6 +44,22 @@ body {
 .header p {
   font-size: 16px;
   opacity: 0.9;
+}
+
+.btn-settings {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  padding: 8px 12px;
+  font-size: 12px;
+  white-space: nowrap;
+  min-height: auto;
+}
+
+.btn-settings:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: translateY(-2px);
 }
 
 .main-content {
@@ -205,6 +229,36 @@ body {
 .section-header h2 {
   margin: 0;
   flex: 1;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-export {
+  background: #007bff;
+  color: white;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.btn-export:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.btn-print {
+  background: #6f42c1;
+  color: white;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.btn-print:hover {
+  background: #5a32a3;
+  transform: translateY(-1px);
 }
 
 .form-group {
@@ -423,6 +477,30 @@ body {
   background: #f8f9fa;
 }
 
+.settings-form {
+  margin-bottom: 20px;
+}
+
+.form-group.checkbox {
+  display: flex;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.form-group.checkbox label {
+  display: flex;
+  align-items: center;
+  font-weight: normal;
+  margin: 0;
+  cursor: pointer;
+}
+
+.form-group.checkbox input[type="checkbox"] {
+  width: auto;
+  margin-right: 8px;
+  cursor: pointer;
+}
+
 .form-message {
   margin-top: 15px;
   padding: 12px;
@@ -596,8 +674,18 @@ tbody tr:hover {
     grid-template-columns: 1fr;
   }
 
+  .header-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .header h1 {
     font-size: 24px;
+  }
+
+  .btn-settings {
+    width: 100%;
+    text-align: center;
   }
 
   th, td {
@@ -630,21 +718,127 @@ tbody tr:hover {
 
 @media (max-width: 600px) {
   .main-content {
-    padding: 15px;
+    padding: 10px;
   }
 
+  .header {
+    padding: 20px 10px;
+  }
+
+  .header h1 {
+    font-size: 20px;
+  }
+
+  .dashboard-section,
+  .filter-section,
   .form-section,
   .table-section {
     padding: 15px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 15px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .filter-controls {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .filter-group input,
+  .filter-group select {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .btn {
+    padding: 10px 14px;
+    font-size: 13px;
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .btn-edit,
+  .btn-delete,
+  .btn-restore,
+  .btn-download,
+  .btn-small {
+    padding: 8px 10px;
+    font-size: 12px;
+    min-height: 40px;
+  }
+
+  .btn-filter {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px;
+  }
+
+  .btn-export,
+  .btn-print,
+  .btn-backup,
+  .btn-stats,
+  .btn-reset {
+    min-height: 44px;
+  }
+
+  .header-buttons {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .header-buttons .btn {
+    width: 100%;
+  }
+
+  .section-header {
+    flex-direction: column;
+    gap: 10px;
   }
 
   table {
     font-size: 12px;
   }
 
-  .btn-edit,
-  .btn-delete {
-    padding: 4px 8px;
-    font-size: 11px;
+  th, td {
+    padding: 8px 6px;
+  }
+
+  .modal-content {
+    width: 95%;
+    padding: 20px;
+  }
+
+  .form-group input,
+  .form-group select {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .modal-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .modal-button,
+  .btn-cancel,
+  .btn-submit {
+    width: 100%;
+  }
+
+  .company-stats-table th,
+  .company-stats-table td {
+    padding: 8px 4px;
+    font-size: 12px;
   }
 }

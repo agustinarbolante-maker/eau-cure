@@ -25,6 +25,16 @@ const closeCompanyStatsModal2Btn = document.getElementById('closeCompanyStatsMod
 const filterCompanySelect = document.getElementById('filterCompany');
 const filterStartDateInput = document.getElementById('filterStartDate');
 const filterEndDateInput = document.getElementById('filterEndDate');
+const exportBtn = document.getElementById('exportBtn');
+const printBtn = document.getElementById('printBtn');
+const settingsHeaderBtn = document.getElementById('settingsHeaderBtn');
+const settingsModal = document.getElementById('settingsModal');
+const closeSettingsModalBtn = document.getElementById('closeSettingsModal');
+const closeSettingsModal2Btn = document.getElementById('closeSettingsModal2');
+const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+const settingsDefaultCompany = document.getElementById('settingsDefaultCompany');
+const settingsRowsPerPage = document.getElementById('settingsRowsPerPage');
+const settingsAutoRefresh = document.getElementById('settingsAutoRefresh');
 
 deliveryForm.addEventListener('submit', handleFormSubmit);
 editForm.addEventListener('submit', handleEditSubmit);
@@ -36,6 +46,12 @@ closeBackupModal2Btn.addEventListener('click', closeBackupModal);
 manualBackupBtn.addEventListener('click', createManualBackup);
 closeCompanyStatsModalBtn.addEventListener('click', closeCompanyStatsModal);
 closeCompanyStatsModal2Btn.addEventListener('click', closeCompanyStatsModal);
+exportBtn.addEventListener('click', exportToCSV);
+printBtn.addEventListener('click', printRecords);
+settingsHeaderBtn.addEventListener('click', openSettingsModal);
+closeSettingsModalBtn.addEventListener('click', closeSettingsModal);
+closeSettingsModal2Btn.addEventListener('click', closeSettingsModal);
+saveSettingsBtn.addEventListener('click', saveSettings);
 
 async function fetchCompanies() {
   try {
@@ -55,6 +71,7 @@ function populateCompanyDropdowns() {
 
   companySelect.innerHTML = '<option value="">-- Select a Company --</option>' + options;
   editCompanySelect.innerHTML = '<option value="">-- Select a Company --</option>' + options;
+  settingsDefaultCompany.innerHTML = '<option value="">None</option>' + options;
   populateFilterCompanyDropdown();
 }
 
@@ -140,17 +157,30 @@ async function handleEditSubmit(e) {
 }
 
 async function deleteDelivery(id) {
-  if (!confirm('Are you sure you want to delete this entry?')) return;
+  const delivery = deliveries.find(d => d.id === id);
 
-  try {
-    const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-    if (!response.ok) throw new Error('Failed to delete delivery');
+  Swal.fire({
+    title: 'Delete Delivery?',
+    text: `Remove delivery for ${delivery.company}?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#dc3545',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel'
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+        if (!response.ok) throw new Error('Failed to delete delivery');
 
-    showMessage('Delivery deleted successfully!', 'success');
-    fetchDeliveries();
-  } catch (err) {
-    showMessage('Error: ' + err.message, 'error');
-  }
+        Swal.fire('Deleted!', 'Delivery deleted successfully.', 'success');
+        fetchDeliveries();
+      } catch (err) {
+        Swal.fire('Error!', 'Failed to delete: ' + err.message, 'error');
+      }
+    }
+  });
 }
 
 function renderTable() {
@@ -251,22 +281,32 @@ async function createManualBackup() {
 }
 
 async function restoreBackup(filename) {
-  if (!confirm('⚠️ WARNING: This will replace your current data with the backup. Are you sure?')) {
-    return;
-  }
+  Swal.fire({
+    title: 'Restore Backup?',
+    text: 'This will replace your current data with the selected backup. This action cannot be undone!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#dc3545',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Yes, restore it!',
+    cancelButtonText: 'Cancel'
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const response = await fetch(`/api/backups/restore/${filename}`, { method: 'POST' });
+        if (!response.ok) throw new Error('Failed to restore backup');
 
-  try {
-    const response = await fetch(`/api/backups/restore/${filename}`, { method: 'POST' });
-    if (!response.ok) throw new Error('Failed to restore backup');
-
-    showMessage('✅ Database restored successfully! Reloading data...', 'success');
-    setTimeout(() => {
-      fetchDeliveries();
-      loadBackupList();
-    }, 1000);
-  } catch (err) {
-    showMessage('Error restoring backup: ' + err.message, 'error');
-  }
+        Swal.fire('Restored!', 'Database restored successfully. Reloading...', 'success');
+        setTimeout(() => {
+          fetchDeliveries();
+          loadBackupList();
+          loadStats();
+        }, 1000);
+      } catch (err) {
+        Swal.fire('Error!', 'Failed to restore backup: ' + err.message, 'error');
+      }
+    }
+  });
 }
 
 function downloadBackup(filename) {
@@ -391,6 +431,106 @@ async function openCompanyStatsModal() {
   } catch (err) {
     showMessage('Error loading company stats: ' + err.message, 'error');
   }
+}
+
+async function exportToCSV() {
+  try {
+    const company = filterCompanySelect.value;
+    const startDate = filterStartDateInput.value;
+    const endDate = filterEndDateInput.value;
+
+    let url = '/api/deliveries/export/csv?';
+    if (company) url += `company=${encodeURIComponent(company)}&`;
+    if (startDate) url += `startDate=${startDate}&`;
+    if (endDate) url += `endDate=${endDate}&`;
+
+    window.location.href = url;
+    showMessage('CSV exported successfully!', 'success');
+  } catch (err) {
+    showMessage('Error exporting CSV: ' + err.message, 'error');
+  }
+}
+
+function printRecords() {
+  const printWindow = window.open('', '', 'height=600,width=800');
+  const table = document.getElementById('deliveriesTable').outerHTML;
+  const stats = `
+    <h2>Delivery Summary</h2>
+    <p><strong>Total Deliveries:</strong> ${document.getElementById('totalDeliveries').textContent}</p>
+    <p><strong>Bottles Delivered:</strong> ${document.getElementById('totalDelivered').textContent}</p>
+    <p><strong>Bottles Returned:</strong> ${document.getElementById('totalReturned').textContent}</p>
+    <p><strong>Net Bottles:</strong> ${document.getElementById('netBottles').textContent}</p>
+  `;
+
+  const filters = `
+    <h3>Filters Applied:</h3>
+    <p>${filterCompanySelect.value ? 'Company: ' + filterCompanySelect.value + '<br>' : ''}
+       ${filterStartDateInput.value ? 'From: ' + filterStartDateInput.value + '<br>' : ''}
+       ${filterEndDateInput.value ? 'To: ' + filterEndDateInput.value : ''}</p>
+  `;
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Eau Cure - Delivery Records</title>
+      <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h2 { color: #667eea; margin-top: 20px; }
+        h3 { color: #764ba2; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #667eea; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        p { line-height: 1.6; }
+        .print-date { color: #666; font-size: 12px; }
+      </style>
+    </head>
+    <body>
+      <h1>Eau Cure - Water Station Delivery Tracker</h1>
+      <p class="print-date">Printed: ${new Date().toLocaleString()}</p>
+      ${stats}
+      ${filterCompanySelect.value || filterStartDateInput.value || filterEndDateInput.value ? filters : ''}
+      ${table}
+    </body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.print();
+}
+
+function loadSettings() {
+  const settings = JSON.parse(localStorage.getItem('eauCureSettings') || '{}');
+  settingsDefaultCompany.value = settings.defaultCompany || '';
+  settingsRowsPerPage.value = settings.rowsPerPage || '10';
+  settingsAutoRefresh.checked = settings.autoRefresh || false;
+}
+
+function openSettingsModal() {
+  loadSettings();
+  settingsModal.classList.remove('hidden');
+}
+
+function closeSettingsModal() {
+  settingsModal.classList.add('hidden');
+}
+
+function saveSettings() {
+  const settings = {
+    defaultCompany: settingsDefaultCompany.value,
+    rowsPerPage: settingsRowsPerPage.value,
+    autoRefresh: settingsAutoRefresh.checked
+  };
+
+  localStorage.setItem('eauCureSettings', JSON.stringify(settings));
+
+  if (settings.defaultCompany) {
+    filterCompanySelect.value = settings.defaultCompany;
+    applyFilters();
+  }
+
+  Swal.fire('Saved!', 'Settings saved successfully.', 'success');
+  closeSettingsModal();
 }
 
 fetchCompanies();
