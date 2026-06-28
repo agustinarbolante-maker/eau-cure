@@ -1198,7 +1198,7 @@ tbody tr:hover {
     text-align: center;
     margin: 20px 0 30px 0;
     font-size: 24px;
-    color: #667eea;
+    color: #dc3545;
     font-weight: bold;
   }
 
@@ -1257,7 +1257,7 @@ tbody tr:hover {
   }
 
   .billing-summary-row.total span:last-child {
-    color: #667eea !important;
+    color: #dc3545 !important;
     font-size: 16px;
   }
 

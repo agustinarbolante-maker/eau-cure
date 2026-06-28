@@ -746,18 +746,18 @@ function renderBillingStatement(data) {
     html += `<td>${date}</td>`;
     html += `<td>${delivery.dr_number}</td>`;
     html += `<td>5 gal round</td>`;
-    html += `<td>${quantity}</td>`;
+    html += `<td style="color: #dc3545; font-weight: 600;">${quantity}</td>`;
     html += `<td>₱${price.toFixed(2)}</td>`;
-    html += `<td>₱${amount.toFixed(2)}</td>`;
+    html += `<td style="color: #dc3545; font-weight: 600;">₱${amount.toFixed(2)}</td>`;
     html += `</tr>`;
   });
 
   html += `</tbody></table>`;
 
   html += `<div class="billing-summary">`;
-  html += `<div class="billing-summary-row"><span>Total Quantity:</span><span>${totalQuantity} bottles</span></div>`;
+  html += `<div class="billing-summary-row"><span>Total Quantity:</span><span style="color: #dc3545; font-weight: 600;">${totalQuantity} bottles</span></div>`;
   html += `<div class="billing-summary-row"><span>Unit Price:</span><span>₱${price.toFixed(2)}</span></div>`;
-  html += `<div class="billing-summary-row total"><span>TOTAL AMOUNT DUE:</span><span>₱${totalAmount.toFixed(2)}</span></div>`;
+  html += `<div class="billing-summary-row total"><span>TOTAL AMOUNT DUE:</span><span style="color: #dc3545;">₱${totalAmount.toFixed(2)}</span></div>`;
   html += `</div>`;
 
   billingContent.innerHTML = html;
@@ -795,12 +795,12 @@ function downloadBillingPdf() {
       if (isTotal) {
         summaryHtml += `<div style="font-weight: bold; font-size: 16px; border-top: 2px solid #000; padding-top: 15px; padding: 10px 0; display: flex; justify-content: space-between;">
           <span>${label}</span>
-          <span style="color: #667eea;">${value}</span>
+          <span style="color: #dc3545;">${value}</span>
         </div>`;
       } else {
         summaryHtml += `<div style="padding: 10px 0; display: flex; justify-content: space-between;">
           <span>${label}</span>
-          <span style="${label.includes('Bottle') ? 'color: #667eea;' : ''}color: #000;">${value}</span>
+          <span style="${label.includes('Bottle') ? 'color: #dc3545; font-weight: 600;' : 'color: #000;'}">${value}</span>
         </div>`;
       }
     });
@@ -815,7 +815,7 @@ function downloadBillingPdf() {
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; padding: 40px 20px; color: #000; }
-        h3 { text-align: center; margin-bottom: 30px; font-size: 24px; color: #667eea; font-weight: bold; }
+        h3 { text-align: center; margin-bottom: 30px; font-size: 24px; color: #dc3545; font-weight: bold; }
         .info { margin-bottom: 20px; font-size: 13px; line-height: 1.6; }
         .info p { margin-bottom: 5px; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 30px; font-size: 12px; }
@@ -824,7 +824,7 @@ function downloadBillingPdf() {
         .billing-summary { margin-top: 20px; }
         .billing-summary > div { padding: 10px 0; display: flex; justify-content: space-between; font-size: 13px; }
         .billing-summary > div:last-child { border-top: 2px solid #000; padding-top: 15px; font-weight: bold; font-size: 14px; }
-        .billing-summary > div:last-child span:last-child { color: #667eea; font-size: 16px; }
+        .billing-summary > div:last-child span:last-child { color: #dc3545; font-size: 16px; }
         @media print {
           body { padding: 20px; }
           h3 { page-break-after: avoid; }
