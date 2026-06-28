@@ -70,6 +70,7 @@
           <button type="button" class="btn btn-reset" onclick="resetFilters()">Reset Filters</button>
           <button type="button" class="btn btn-stats" onclick="openCompanyStatsModal()">📈 Company Stats</button>
           <button type="button" class="btn btn-billing" onclick="openBillingModal()">📄 Billing Statement</button>
+          <button type="button" class="btn btn-history" onclick="openBillingHistoryModal()">📚 Billing History</button>
           <button type="button" class="btn btn-daily" onclick="openDailyReportModal()">📋 Daily Report</button>
           <button type="button" class="btn btn-add-company" onclick="openAddCompanyModal()">➕ Add Company</button>
         </div>
@@ -300,7 +301,21 @@
       <div class="modal-buttons">
         <button type="button" class="btn btn-print" id="printBillingBtn" style="display: none;">🖨️ Print</button>
         <button type="button" class="btn btn-submit" id="downloadBillingPdfBtn" style="display: none;">📥 Download PDF</button>
+        <button type="button" class="btn btn-success" id="saveBillingBtn" style="display: none;">💾 Save Statement</button>
         <button type="button" class="btn btn-cancel" id="closeBillingModal2">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="billingHistoryModal" class="modal hidden">
+    <div class="modal-content modal-wide">
+      <div class="modal-header">
+        <h2>Billing Statements History</h2>
+        <button type="button" class="modal-close" id="closeBillingHistoryModal">&times;</button>
+      </div>
+      <div id="billingHistoryContent" class="billing-history-content"></div>
+      <div class="modal-buttons">
+        <button type="button" class="btn btn-cancel" id="closeBillingHistoryModal2">Close</button>
       </div>
     </div>
   </div>

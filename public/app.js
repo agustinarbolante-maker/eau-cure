@@ -51,6 +51,11 @@ const billingEndDateInput = document.getElementById('billingEndDate');
 const billingContent = document.getElementById('billingContent');
 const printBillingBtn = document.getElementById('printBillingBtn');
 const downloadBillingPdfBtn = document.getElementById('downloadBillingPdfBtn');
+const saveBillingBtn = document.getElementById('saveBillingBtn');
+const billingHistoryModal = document.getElementById('billingHistoryModal');
+const closeBillingHistoryModalBtn = document.getElementById('closeBillingHistoryModal');
+const closeBillingHistoryModal2Btn = document.getElementById('closeBillingHistoryModal2');
+const billingHistoryContent = document.getElementById('billingHistoryContent');
 const addCompanyModal = document.getElementById('addCompanyModal');
 const closeAddCompanyModalBtn = document.getElementById('closeAddCompanyModal');
 const closeAddCompanyModal2Btn = document.getElementById('closeAddCompanyModal2');
@@ -98,9 +103,12 @@ closeAddCompanyModalBtn.addEventListener('click', closeAddCompanyModal);
 closeAddCompanyModal2Btn.addEventListener('click', closeAddCompanyModal);
 printBillingBtn.addEventListener('click', printBillingStatement);
 downloadBillingPdfBtn.addEventListener('click', downloadBillingPdf);
+saveBillingBtn.addEventListener('click', saveBillingStatement);
 billingCompanySelect.addEventListener('change', generateBillingStatement);
 billingStartDateInput.addEventListener('change', generateBillingStatement);
 billingEndDateInput.addEventListener('change', generateBillingStatement);
+closeBillingHistoryModalBtn.addEventListener('click', closeBillingHistoryModal);
+closeBillingHistoryModal2Btn.addEventListener('click', closeBillingHistoryModal);
 closeDailyReportModalBtn.addEventListener('click', closeDailyReportModal);
 closeDailyReportModal2Btn.addEventListener('click', closeDailyReportModal);
 reportDateInput.addEventListener('change', generateDailyReport);
@@ -726,6 +734,9 @@ function renderBillingStatement(data) {
 
   const price = parseFloat(unitPrice) || 0;
 
+  // Store data for saving later
+  currentBillingStatementData = { company, startDate, endDate, totalAmount: 0 };
+
   let html = `<h3 style="text-align: center; margin-bottom: 20px;">Billing Statement</h3>`;
   html += `<div style="font-size: 13px; margin-bottom: 15px;">`;
   html += `<p><strong>Company:</strong> ${company}</p>`;
@@ -773,6 +784,10 @@ function renderBillingStatement(data) {
   html += `</div>`;
 
   billingContent.innerHTML = html;
+
+  // Store total amount for saving
+  currentBillingStatementData.totalAmount = totalAmount;
+  saveBillingBtn.style.display = 'inline-block';
 }
 
 function printBillingStatement() {
@@ -1045,6 +1060,115 @@ function downloadDailyReport() {
   a.download = `daily_report_${date}.html`;
   a.click();
   window.URL.revokeObjectURL(url);
+}
+
+let currentBillingStatementData = null;
+
+async function saveBillingStatement() {
+  if (!currentBillingStatementData) {
+    showMessage('No billing statement to save', 'error');
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/billing-statements', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        company: currentBillingStatementData.company,
+        startDate: currentBillingStatementData.startDate,
+        endDate: currentBillingStatementData.endDate,
+        totalAmount: currentBillingStatementData.totalAmount
+      })
+    });
+
+    if (!response.ok) throw new Error('Failed to save billing statement');
+    const result = await response.json();
+    showMessage('Billing statement saved successfully!', 'success');
+    saveBillingBtn.style.display = 'none';
+  } catch (err) {
+    showMessage('Error: ' + err.message, 'error');
+  }
+}
+
+function openBillingHistoryModal() {
+  billingHistoryModal.classList.remove('hidden');
+  loadBillingHistory();
+}
+
+function closeBillingHistoryModal() {
+  billingHistoryModal.classList.add('hidden');
+}
+
+async function loadBillingHistory() {
+  try {
+    const response = await fetch('/api/billing-statements');
+    if (!response.ok) throw new Error('Failed to load billing history');
+    const statements = await response.json();
+
+    if (statements.length === 0) {
+      billingHistoryContent.innerHTML = '<p style="text-align: center; color: #999;">No billing statements saved yet</p>';
+      return;
+    }
+
+    let html = '<table class="billing-history-table"><thead><tr>';
+    html += '<th>Company</th><th>Period</th><th>Amount</th><th>Status</th><th>Action</th>';
+    html += '</tr></thead><tbody>';
+
+    statements.forEach(stmt => {
+      const startDate = new Date(stmt.start_date).toLocaleDateString();
+      const endDate = new Date(stmt.end_date).toLocaleDateString();
+      const statusClass = stmt.is_paid ? 'status-paid' : 'status-unpaid';
+      const statusText = stmt.is_paid ? 'PAID' : 'UNPAID';
+
+      html += '<tr>';
+      html += `<td>${stmt.company_name}</td>`;
+      html += `<td>${startDate} - ${endDate}</td>`;
+      html += `<td>₱${parseFloat(stmt.total_amount).toFixed(2)}</td>`;
+      html += `<td><span class="status-badge ${statusClass}" onclick="togglePaidStatus(${stmt.id}, ${stmt.is_paid})">${statusText}</span></td>`;
+      html += `<td><button class="btn btn-sm" onclick="deleteBillingStatement(${stmt.id})">Delete</button></td>`;
+      html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+    billingHistoryContent.innerHTML = html;
+  } catch (err) {
+    showMessage('Error: ' + err.message, 'error');
+  }
+}
+
+async function togglePaidStatus(id, currentStatus) {
+  try {
+    const response = await fetch(`/api/billing-statements/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ isPaid: !currentStatus })
+    });
+
+    if (!response.ok) throw new Error('Failed to update status');
+    showMessage('Status updated successfully!', 'success');
+    loadBillingHistory();
+  } catch (err) {
+    showMessage('Error: ' + err.message, 'error');
+  }
+}
+
+async function deleteBillingStatement(id) {
+  if (!confirm('Are you sure you want to delete this billing statement?')) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/billing-statements/${id}`, {
+      method: 'DELETE'
+    });
+
+    if (!response.ok) throw new Error('Failed to delete statement');
+    showMessage('Billing statement deleted!', 'success');
+    loadBillingHistory();
+  } catch (err) {
+    showMessage('Error: ' + err.message, 'error');
+  }
 }
 
 const today = new Date();

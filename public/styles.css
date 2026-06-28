@@ -222,6 +222,7 @@ body {
 
 .btn-billing,
 .btn-daily,
+.btn-history,
 .btn-add-company {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -231,9 +232,71 @@ body {
 
 .btn-billing:hover,
 .btn-daily:hover,
+.btn-history:hover,
 .btn-add-company:hover {
   background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
   transform: translateY(-2px);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
+  transform: translateY(-2px);
+}
+
+.billing-history-content {
+  margin: 20px 0;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.billing-history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.billing-history-table th {
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+  font-weight: bold;
+  color: #000;
+}
+
+.billing-history-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  color: #000;
+}
+
+.billing-history-table tr:hover {
+  background: #f9f9f9;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.status-unpaid {
+  background: #dc3545;
+  color: white;
+}
+
+.status-paid {
+  background: #28a745;
+  color: white;
 }
 
 .daily-report-controls {

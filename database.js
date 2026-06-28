@@ -52,12 +52,32 @@ function initDB() {
               if (err2) {
                 reject(err2);
               } else {
-                seedCompanies().then(() => resolve()).catch(reject);
+                initBillingStatementsTable().then(() => seedCompanies()).then(() => resolve()).catch(reject);
               }
             });
           }
         });
       }
+    });
+  });
+}
+
+function initBillingStatementsTable() {
+  return new Promise((resolve, reject) => {
+    db.run(`
+      CREATE TABLE IF NOT EXISTS billing_statements (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_name TEXT NOT NULL,
+        start_date TEXT NOT NULL,
+        end_date TEXT NOT NULL,
+        total_amount REAL NOT NULL,
+        is_paid INTEGER DEFAULT 0,
+        created_date TEXT DEFAULT CURRENT_TIMESTAMP,
+        paid_date TEXT
+      )
+    `, (err) => {
+      if (err) reject(err);
+      else resolve();
     });
   });
 }
@@ -205,6 +225,59 @@ function getBillingStatement(companyName, startDate, endDate) {
       (err, rows) => {
         if (err) reject(err);
         else resolve(rows || []);
+      }
+    );
+  });
+}
+
+function saveBillingStatement(companyName, startDate, endDate, totalAmount) {
+  return new Promise((resolve, reject) => {
+    db.run(
+      `INSERT INTO billing_statements (company_name, start_date, end_date, total_amount, is_paid)
+       VALUES (?, ?, ?, ?, 0)`,
+      [companyName, startDate, endDate, totalAmount],
+      function(err) {
+        if (err) reject(err);
+        else resolve(this.lastID);
+      }
+    );
+  });
+}
+
+function getAllBillingStatements() {
+  return new Promise((resolve, reject) => {
+    db.all(
+      `SELECT * FROM billing_statements ORDER BY created_date DESC`,
+      (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows || []);
+      }
+    );
+  });
+}
+
+function updateBillingStatementStatus(id, isPaid) {
+  return new Promise((resolve, reject) => {
+    const paidDate = isPaid ? new Date().toISOString() : null;
+    db.run(
+      `UPDATE billing_statements SET is_paid = ?, paid_date = ? WHERE id = ?`,
+      [isPaid ? 1 : 0, paidDate, id],
+      function(err) {
+        if (err) reject(err);
+        else resolve();
+      }
+    );
+  });
+}
+
+function deleteBillingStatement(id) {
+  return new Promise((resolve, reject) => {
+    db.run(
+      `DELETE FROM billing_statements WHERE id = ?`,
+      [id],
+      function(err) {
+        if (err) reject(err);
+        else resolve();
       }
     );
   });
@@ -401,6 +474,10 @@ module.exports = {
   addCompany,
   getCompanyPrice,
   getBillingStatement,
+  saveBillingStatement,
+  getAllBillingStatements,
+  updateBillingStatementStatus,
+  deleteBillingStatement,
   getDeliveriesByFilters,
   getStats,
   getCompanyStats,

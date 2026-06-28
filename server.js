@@ -60,6 +60,56 @@ app.get('/api/billing/:company', async (req, res) => {
   }
 });
 
+app.post('/api/billing-statements', async (req, res) => {
+  try {
+    const { company, startDate, endDate, totalAmount } = req.body;
+
+    if (!company || !startDate || !endDate || totalAmount === undefined) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    const id = await db.saveBillingStatement(company, startDate, endDate, totalAmount);
+    res.json({ id, message: 'Billing statement saved successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/billing-statements', async (req, res) => {
+  try {
+    const statements = await db.getAllBillingStatements();
+    res.json(statements);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.put('/api/billing-statements/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isPaid } = req.body;
+
+    if (isPaid === undefined) {
+      return res.status(400).json({ error: 'isPaid field is required' });
+    }
+
+    await db.updateBillingStatementStatus(id, isPaid);
+    res.json({ message: 'Billing statement updated successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/billing-statements/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.deleteBillingStatement(id);
+    res.json({ message: 'Billing statement deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/deliveries', async (req, res) => {
   try {
     const { company, startDate, endDate } = req.query;
