@@ -135,20 +135,11 @@ body {
 }
 
 .dashboard-section,
-.filter-section {
-  grid-column: 1 / -1;
-}
-
-.form-section,
-.table-section {
-  grid-column: 2;
-}
-
-.dashboard-section,
 .filter-section,
 .form-section,
-.table-section {
-  background: #f8f9fa;
+.table-section,
+.calendar-section {
+  background: white;
   padding: 25px;
   border-radius: 8px;
   border: 1px solid #e9ecef;
@@ -887,10 +878,6 @@ body {
   border-radius: 12px;
   border: 1px solid #e0e0e0;
   height: fit-content;
-  position: sticky;
-  top: 20px;
-  grid-column: 1;
-  grid-row: 3 / span 2;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
