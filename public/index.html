@@ -72,13 +72,24 @@
         </div>
       </section>
 
+      <section class="calendar-section">
+        <h2>📅 Calendar</h2>
+        <div class="calendar-controls">
+          <button type="button" class="btn btn-nav" id="prevMonth">← Prev</button>
+          <span id="calendarMonth" class="calendar-month">June 2026</span>
+          <button type="button" class="btn btn-nav" id="nextMonth">Next →</button>
+        </div>
+        <div class="calendar-container" id="calendar"></div>
+        <div class="selected-date-display">
+          <strong>Selected Date:</strong> <span id="selectedDateFromCalendar">Today</span>
+        </div>
+      </section>
+
       <section class="form-section">
-        <h2>📅 New Delivery Entry</h2>
+        <h2>📝 New Delivery Entry</h2>
         <div class="date-picker-section">
-          <label for="deliveryDate">Select Date:</label>
-          <input type="date" id="deliveryDate" required>
-          <input type="time" id="deliveryTime" value="09:00" required>
-          <span class="selected-date" id="selectedDateDisplay">Today</span>
+          <span class="form-selected-date">Adding for: <strong id="formDateDisplay">Today</strong></span>
+          <input type="time" id="deliveryTime" value="09:00" required style="display: none;">
         </div>
 
         <form id="deliveryForm">

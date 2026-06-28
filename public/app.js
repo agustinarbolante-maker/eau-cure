@@ -35,9 +35,17 @@ const saveSettingsBtn = document.getElementById('saveSettingsBtn');
 const settingsDefaultCompany = document.getElementById('settingsDefaultCompany');
 const settingsRowsPerPage = document.getElementById('settingsRowsPerPage');
 const settingsAutoRefresh = document.getElementById('settingsAutoRefresh');
-const deliveryDate = document.getElementById('deliveryDate');
 const deliveryTime = document.getElementById('deliveryTime');
-const selectedDateDisplay = document.getElementById('selectedDateDisplay');
+const calendar = document.getElementById('calendar');
+const calendarMonth = document.getElementById('calendarMonth');
+const prevMonthBtn = document.getElementById('prevMonth');
+const nextMonthBtn = document.getElementById('nextMonth');
+const selectedDateFromCalendar = document.getElementById('selectedDateFromCalendar');
+const formDateDisplay = document.getElementById('formDateDisplay');
+
+let currentCalendarDate = new Date();
+let selectedDateForDeliveries = new Date();
+const deliveryCountByDate = {};
 
 deliveryForm.addEventListener('submit', handleFormSubmit);
 editForm.addEventListener('submit', handleEditSubmit);
@@ -57,6 +65,14 @@ settingsHeaderBtn.addEventListener('click', openSettingsModal);
 closeSettingsModalBtn.addEventListener('click', closeSettingsModal);
 closeSettingsModal2Btn.addEventListener('click', closeSettingsModal);
 saveSettingsBtn.addEventListener('click', saveSettings);
+prevMonthBtn.addEventListener('click', () => {
+  currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+  renderCalendar();
+});
+nextMonthBtn.addEventListener('click', () => {
+  currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+  renderCalendar();
+});
 
 async function fetchCompanies() {
   try {
@@ -85,7 +101,18 @@ async function fetchDeliveries() {
     const response = await fetch(API_URL);
     if (!response.ok) throw new Error('Failed to fetch deliveries');
     deliveries = await response.json();
+
+    for (const key in deliveryCountByDate) {
+      delete deliveryCountByDate[key];
+    }
+
+    deliveries.forEach(delivery => {
+      const dateStr = delivery.timestamp.split('T')[0];
+      deliveryCountByDate[dateStr] = (deliveryCountByDate[dateStr] || 0) + 1;
+    });
+
     renderTable();
+    renderCalendar();
   } catch (err) {
     showMessage('Error loading deliveries: ' + err.message, 'error');
   }
@@ -98,15 +125,10 @@ async function handleFormSubmit(e) {
   const bottlesDelivered = parseInt(document.getElementById('bottlesDelivered').value);
   const bottlesReturned = parseInt(document.getElementById('bottlesReturned').value);
   const drNumber = document.getElementById('drNumber').value;
-  const date = deliveryDate.value;
   const time = deliveryTime.value;
 
-  if (!date || !time) {
-    showMessage('Please select a date and time', 'error');
-    return;
-  }
-
-  const timestamp = new Date(`${date}T${time}:00`).toISOString();
+  const dateStr = selectedDateForDeliveries.toISOString().split('T')[0];
+  const timestamp = new Date(`${dateStr}T${time}:00`).toISOString();
 
   try {
     const response = await fetch(API_URL, {
@@ -117,11 +139,11 @@ async function handleFormSubmit(e) {
 
     if (!response.ok) throw new Error('Failed to add delivery');
 
-    showMessage('Delivery added successfully!', 'success');
+    showMessage('Delivery added to ' + selectedDateForDeliveries.toLocaleDateString() + '!', 'success');
     deliveryForm.reset();
-    resetDatePicker();
     fetchDeliveries();
     loadStats();
+    renderCalendar();
   } catch (err) {
     showMessage('Error: ' + err.message, 'error');
   }
@@ -146,25 +168,66 @@ function closeEditModal() {
   editingId = null;
 }
 
-function updateDateDisplay() {
-  const date = deliveryDate.value;
-  if (!date) {
-    selectedDateDisplay.textContent = 'Select a date';
-    return;
-  }
-
-  const dateObj = new Date(date + 'T00:00:00');
+function selectDateFromCalendar(date) {
+  selectedDateForDeliveries = new Date(date);
   const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-  const formatted = dateObj.toLocaleDateString('en-US', options);
-  const time = deliveryTime.value;
-  selectedDateDisplay.textContent = `${formatted} at ${time}`;
+  const formatted = selectedDateForDeliveries.toLocaleDateString('en-US', options);
+
+  selectedDateFromCalendar.textContent = formatted;
+  formDateDisplay.textContent = formatted;
+  renderCalendar();
+
+  showMessage(`Selected date: ${formatted}`, 'success');
 }
 
-function resetDatePicker() {
-  const today = new Date().toISOString().split('T')[0];
-  deliveryDate.value = today;
-  deliveryTime.value = '09:00';
-  updateDateDisplay();
+function renderCalendar() {
+  const year = currentCalendarDate.getFullYear();
+  const month = currentCalendarDate.getMonth();
+
+  calendarMonth.textContent = new Date(year, month).toLocaleDateString('en-US', {
+    month: 'long',
+    year: 'numeric'
+  });
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+  let html = '<div class="calendar-grid">';
+
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  dayNames.forEach(day => {
+    html += `<div class="calendar-day-header">${day}</div>`;
+  });
+
+  for (let i = firstDay - 1; i >= 0; i--) {
+    html += `<div class="calendar-day other-month"></div>`;
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(year, month, day);
+    const dateStr = date.toISOString().split('T')[0];
+    const isSelected = date.toDateString() === selectedDateForDeliveries.toDateString();
+    const isToday = date.toDateString() === new Date().toDateString();
+
+    const count = deliveryCountByDate[dateStr] || 0;
+    const countBadge = count > 0 ? `<span class="delivery-count">${count}</span>` : '';
+
+    html += `
+      <div class="calendar-day ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''}"
+           onclick="selectDateFromCalendar('${dateStr}')">
+        <div class="day-number">${day}</div>
+        ${countBadge}
+      </div>
+    `;
+  }
+
+  for (let day = 1; day <= (42 - daysInMonth - firstDay); day++) {
+    html += `<div class="calendar-day other-month"></div>`;
+  }
+
+  html += '</div>';
+  calendar.innerHTML = html;
 }
 
 async function handleEditSubmit(e) {
@@ -570,7 +633,7 @@ function saveSettings() {
   closeSettingsModal();
 }
 
-resetDatePicker();
+selectDateFromCalendar(new Date().toISOString().split('T')[0]);
 
 fetchCompanies();
 fetchDeliveries();
