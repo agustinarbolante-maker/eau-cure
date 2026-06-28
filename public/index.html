@@ -69,6 +69,8 @@
           </div>
           <button type="button" class="btn btn-reset" onclick="resetFilters()">Reset Filters</button>
           <button type="button" class="btn btn-stats" onclick="openCompanyStatsModal()">📈 Company Stats</button>
+          <button type="button" class="btn btn-billing" onclick="openBillingModal()">📄 Billing Statement</button>
+          <button type="button" class="btn btn-add-company" onclick="openAddCompanyModal()">➕ Add Company</button>
         </div>
       </section>
 
@@ -268,6 +270,62 @@
           <button type="submit" class="btn btn-submit">Save Changes</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <div id="billingModal" class="modal hidden">
+    <div class="modal-content modal-wide">
+      <div class="modal-header">
+        <h2>Billing Statement</h2>
+        <button type="button" class="modal-close" id="closeBillingModal">&times;</button>
+      </div>
+      <div class="billing-controls">
+        <div class="form-group">
+          <label for="billingCompany">Company:</label>
+          <select id="billingCompany" required>
+            <option value="">-- Select a Company --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="billingStartDate">Start Date:</label>
+          <input type="date" id="billingStartDate" required>
+        </div>
+        <div class="form-group">
+          <label for="billingEndDate">End Date:</label>
+          <input type="date" id="billingEndDate" required>
+        </div>
+        <button type="button" class="btn btn-submit" onclick="generateBillingStatement()">Generate Statement</button>
+      </div>
+      <div id="billingContent" class="billing-content"></div>
+      <div class="modal-buttons">
+        <button type="button" class="btn btn-print" id="printBillingBtn" style="display: none;">🖨️ Print</button>
+        <button type="button" class="btn btn-submit" id="downloadBillingPdfBtn" style="display: none;">📥 Download PDF</button>
+        <button type="button" class="btn btn-cancel" id="closeBillingModal2">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="addCompanyModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Add New Company</h2>
+        <button type="button" class="modal-close" id="closeAddCompanyModal">&times;</button>
+      </div>
+      <form id="addCompanyForm">
+        <div class="form-group">
+          <label for="newCompanyName">Company Name:</label>
+          <input type="text" id="newCompanyName" required placeholder="Enter company name">
+        </div>
+        <div class="form-group">
+          <label for="newCompanyPrice">Unit Price (per bottle):</label>
+          <input type="number" id="newCompanyPrice" step="0.01" required placeholder="e.g., 17.50">
+        </div>
+      </form>
+      <div id="addCompanyMessage" class="form-message"></div>
+      <div class="modal-buttons">
+        <button type="button" class="btn btn-submit" onclick="submitAddCompany()">Add Company</button>
+        <button type="button" class="btn btn-cancel" id="closeAddCompanyModal2">Cancel</button>
+      </div>
     </div>
   </div>
 

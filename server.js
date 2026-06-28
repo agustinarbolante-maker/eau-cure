@@ -11,10 +11,50 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/api/companies', (req, res) => {
+app.get('/api/companies', async (req, res) => {
   try {
-    const companies = db.getCompanies();
+    const companies = await db.getAllCompaniesFromDB();
+    res.json(companies.map(c => c.name));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/companies/all', async (req, res) => {
+  try {
+    const companies = await db.getAllCompaniesFromDB();
     res.json(companies);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/companies', async (req, res) => {
+  try {
+    const { name, unitPrice } = req.body;
+    if (!name || unitPrice === undefined) {
+      return res.status(400).json({ error: 'Name and unit price are required' });
+    }
+    const id = await db.addCompany(name, unitPrice);
+    res.json({ id, name, unitPrice, message: 'Company added successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/billing/:company', async (req, res) => {
+  try {
+    const { company } = req.params;
+    const { startDate, endDate } = req.query;
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({ error: 'Start date and end date are required' });
+    }
+
+    const deliveries = await db.getBillingStatement(company, startDate, endDate);
+    const unitPrice = await db.getCompanyPrice(company);
+
+    res.json({ company, unitPrice, deliveries, startDate, endDate });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

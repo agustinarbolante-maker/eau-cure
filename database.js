@@ -30,21 +30,81 @@ function initDB() {
         reject(err);
       } else {
         db.run(`
-          CREATE TABLE IF NOT EXISTS deliveries (
+          CREATE TABLE IF NOT EXISTS companies (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            company TEXT NOT NULL,
-            bottles_delivered INTEGER NOT NULL,
-            bottles_returned INTEGER NOT NULL,
-            dr_number TEXT NOT NULL,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+            name TEXT UNIQUE NOT NULL,
+            unit_price REAL NOT NULL
           )
-        `, (err) => {
-          if (err) {
-            reject(err);
+        `, (err1) => {
+          if (err1) {
+            reject(err1);
           } else {
-            resolve();
+            db.run(`
+              CREATE TABLE IF NOT EXISTS deliveries (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company TEXT NOT NULL,
+                bottles_delivered INTEGER NOT NULL,
+                bottles_returned INTEGER NOT NULL,
+                dr_number TEXT NOT NULL,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+              )
+            `, (err2) => {
+              if (err2) {
+                reject(err2);
+              } else {
+                seedCompanies().then(() => resolve()).catch(reject);
+              }
+            });
           }
         });
+      }
+    });
+  });
+}
+
+function seedCompanies() {
+  const companyData = [
+    { name: 'HRD', price: 17 }, { name: 'HRD Canteen', price: 17 }, { name: 'I-Cube', price: 17 },
+    { name: 'Exterior', price: 17 }, { name: 'I-Cube 1st Floor Pantry', price: 17 },
+    { name: 'HRD Logistics', price: 17 }, { name: 'DHR', price: 17 }, { name: 'DHR Logistics', price: 17 },
+    { name: 'Majestic', price: 17 }, { name: 'Majestic Energy Corp.', price: 17 },
+    { name: 'Batching', price: 17 }, { name: 'CFD', price: 17 }, { name: 'CEZ 2', price: 17 },
+    { name: 'HTI', price: 17 }, { name: 'SCAD 5th Factory', price: 17 }, { name: 'SCAD', price: 17 },
+    { name: 'PV Tech', price: 17 }, { name: 'WUKONG Expansion', price: 17 },
+    { name: 'Wukong 4th factory', price: 17 }, { name: 'Wukong Plastic Moulding', price: 17 },
+    { name: 'Wukong Prep 4.0', price: 17 }, { name: 'Wukong Sawmill', price: 17 },
+    { name: 'Wukong CEZ 2 Warehouse Majestic', price: 17 }, { name: 'Wukong Steel Majestic', price: 17 },
+    { name: 'Arkray', price: 18 }, { name: 'Santech Neomax 1', price: 19.5 },
+    { name: 'Santech Neomax 2', price: 19.5 }, { name: 'Santech Thermal', price: 19.5 },
+    { name: 'Santech Admin', price: 19.5 }, { name: 'Santech STAP', price: 19.5 },
+    { name: 'Santech STAA', price: 19.5 }, { name: 'MEC', price: 20 },
+    { name: 'Itabashi', price: 20 }, { name: 'S&S Phils', price: 20 },
+    { name: 'Seintogether', price: 20 }, { name: 'Danam', price: 20 },
+    { name: 'Danam Canteen', price: 20 }, { name: 'Danam T', price: 20 },
+    { name: 'Danam Warehouse', price: 20 }, { name: 'Wyntron', price: 20 },
+    { name: 'Wyntron Canteen', price: 20 }, { name: 'Wyntron Warehouse', price: 20 },
+    { name: 'Wyntron Stafhouse', price: 20 }, { name: 'PVi', price: 20 },
+    { name: 'PVI Canteen', price: 20 }, { name: 'DKP', price: 20 },
+    { name: 'DKP Canteen', price: 20 }, { name: 'Dyna', price: 20 },
+    { name: 'EN', price: 20 }, { name: 'NX Logistics', price: 20 },
+    { name: 'Warehouse Management', price: 20 }, { name: 'RCBC', price: 20 },
+    { name: 'Castem', price: 21 }, { name: 'YKY', price: 21 },
+    { name: 'GOLDRICH', price: 22 }, { name: 'YM Tech', price: 23 }
+  ];
+
+  return new Promise((resolve, reject) => {
+    db.all("SELECT COUNT(*) as count FROM companies", (err, rows) => {
+      if (err) {
+        reject(err);
+      } else if (rows[0].count === 0) {
+        const stmt = db.prepare("INSERT OR IGNORE INTO companies (name, unit_price) VALUES (?, ?)");
+        companyData.forEach(c => stmt.run(c.name, c.price));
+        stmt.finalize((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      } else {
+        resolve();
       }
     });
   });
@@ -97,6 +157,57 @@ function deleteDelivery(id) {
 
 function getCompanies() {
   return COMPANIES;
+}
+
+function getAllCompaniesFromDB() {
+  return new Promise((resolve, reject) => {
+    db.all("SELECT id, name, unit_price FROM companies ORDER BY name", (err, rows) => {
+      if (err) reject(err);
+      else resolve(rows || []);
+    });
+  });
+}
+
+function addCompany(name, unitPrice) {
+  return new Promise((resolve, reject) => {
+    db.run(
+      "INSERT INTO companies (name, unit_price) VALUES (?, ?)",
+      [name, unitPrice],
+      function(err) {
+        if (err) reject(err);
+        else resolve(this.lastID);
+      }
+    );
+  });
+}
+
+function getCompanyPrice(companyName) {
+  return new Promise((resolve, reject) => {
+    db.get(
+      "SELECT unit_price FROM companies WHERE name = ?",
+      [companyName],
+      (err, row) => {
+        if (err) reject(err);
+        else resolve(row ? row.unit_price : 0);
+      }
+    );
+  });
+}
+
+function getBillingStatement(companyName, startDate, endDate) {
+  return new Promise((resolve, reject) => {
+    db.all(
+      `SELECT id, company, bottles_delivered, bottles_returned, dr_number, timestamp
+       FROM deliveries
+       WHERE company = ? AND timestamp >= ? AND timestamp <= ?
+       ORDER BY timestamp`,
+      [companyName, startDate + 'T00:00:00', endDate + 'T23:59:59'],
+      (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows || []);
+      }
+    );
+  });
 }
 
 function getDeliveriesByFilters(company, startDate, endDate) {
@@ -286,6 +397,10 @@ module.exports = {
   updateDelivery,
   deleteDelivery,
   getCompanies,
+  getAllCompaniesFromDB,
+  addCompany,
+  getCompanyPrice,
+  getBillingStatement,
   getDeliveriesByFilters,
   getStats,
   getCompanyStats,

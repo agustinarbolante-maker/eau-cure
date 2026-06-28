@@ -42,6 +42,20 @@ const prevMonthBtn = document.getElementById('prevMonth');
 const nextMonthBtn = document.getElementById('nextMonth');
 const selectedDateFromCalendar = document.getElementById('selectedDateFromCalendar');
 const formDateDisplay = document.getElementById('formDateDisplay');
+const billingModal = document.getElementById('billingModal');
+const closeBillingModalBtn = document.getElementById('closeBillingModal');
+const closeBillingModal2Btn = document.getElementById('closeBillingModal2');
+const billingCompanySelect = document.getElementById('billingCompany');
+const billingStartDateInput = document.getElementById('billingStartDate');
+const billingEndDateInput = document.getElementById('billingEndDate');
+const billingContent = document.getElementById('billingContent');
+const printBillingBtn = document.getElementById('printBillingBtn');
+const downloadBillingPdfBtn = document.getElementById('downloadBillingPdfBtn');
+const addCompanyModal = document.getElementById('addCompanyModal');
+const closeAddCompanyModalBtn = document.getElementById('closeAddCompanyModal');
+const closeAddCompanyModal2Btn = document.getElementById('closeAddCompanyModal2');
+const addCompanyForm = document.getElementById('addCompanyForm');
+const addCompanyMessage = document.getElementById('addCompanyMessage');
 
 let currentCalendarDate = new Date();
 let selectedDateForDeliveries = new Date();
@@ -71,6 +85,12 @@ nextMonthBtn.addEventListener('click', () => {
   currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
   renderCalendar();
 });
+closeBillingModalBtn.addEventListener('click', closeBillingModal);
+closeBillingModal2Btn.addEventListener('click', closeBillingModal);
+closeAddCompanyModalBtn.addEventListener('click', closeAddCompanyModal);
+closeAddCompanyModal2Btn.addEventListener('click', closeAddCompanyModal);
+printBillingBtn.addEventListener('click', printBillingStatement);
+downloadBillingPdfBtn.addEventListener('click', downloadBillingPdf);
 
 async function fetchCompanies() {
   try {
@@ -639,6 +659,191 @@ function saveSettings() {
 
   Swal.fire('Saved!', 'Settings saved successfully.', 'success');
   closeSettingsModal();
+}
+
+function openBillingModal() {
+  billingModal.classList.remove('hidden');
+  // Set default dates to current month
+  const today = new Date();
+  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+  const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  billingStartDateInput.value = firstDay.toISOString().split('T')[0];
+  billingEndDateInput.value = lastDay.toISOString().split('T')[0];
+  // Populate company dropdown
+  billingCompanySelect.innerHTML = '<option value="">-- Select a Company --</option>';
+  companies.forEach(company => {
+    billingCompanySelect.innerHTML += `<option value="${company}">${company}</option>`;
+  });
+}
+
+function closeBillingModal() {
+  billingModal.classList.add('hidden');
+  billingContent.innerHTML = '';
+  printBillingBtn.style.display = 'none';
+  downloadBillingPdfBtn.style.display = 'none';
+}
+
+async function generateBillingStatement() {
+  const company = billingCompanySelect.value;
+  const startDate = billingStartDateInput.value;
+  const endDate = billingEndDateInput.value;
+
+  if (!company || !startDate || !endDate) {
+    showMessage('Please select a company and date range', 'error');
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/billing/${encodeURIComponent(company)}?startDate=${startDate}&endDate=${endDate}`);
+    if (!response.ok) throw new Error('Failed to fetch billing statement');
+    const data = await response.json();
+
+    renderBillingStatement(data);
+    printBillingBtn.style.display = 'inline-block';
+    downloadBillingPdfBtn.style.display = 'inline-block';
+  } catch (err) {
+    showMessage('Error: ' + err.message, 'error');
+  }
+}
+
+function renderBillingStatement(data) {
+  const { company, unitPrice, deliveries, startDate, endDate } = data;
+
+  let html = `<h3 style="text-align: center; margin-bottom: 20px;">Billing Statement</h3>`;
+  html += `<div style="font-size: 13px; margin-bottom: 15px;">`;
+  html += `<p><strong>Company:</strong> ${company}</p>`;
+  html += `<p><strong>Period:</strong> ${new Date(startDate).toLocaleDateString()} - ${new Date(endDate).toLocaleDateString()}</p>`;
+  html += `<p><strong>Unit Price:</strong> ₱${unitPrice.toFixed(2)} per bottle</p>`;
+  html += `</div>`;
+
+  if (deliveries.length === 0) {
+    html += `<p style="text-align: center; color: #999;">No deliveries found for this period</p>`;
+    billingContent.innerHTML = html;
+    return;
+  }
+
+  html += `<table class="billing-table">`;
+  html += `<thead><tr>`;
+  html += `<th>Date</th><th>DR Number</th><th>Delivered</th><th>Returned</th><th>Net</th><th>Amount</th>`;
+  html += `</tr></thead><tbody>`;
+
+  let totalDelivered = 0, totalReturned = 0, totalAmount = 0;
+
+  deliveries.forEach(delivery => {
+    const date = new Date(delivery.timestamp).toLocaleDateString();
+    const net = delivery.bottles_delivered - delivery.bottles_returned;
+    const amount = net * unitPrice;
+
+    totalDelivered += delivery.bottles_delivered;
+    totalReturned += delivery.bottles_returned;
+    totalAmount += amount;
+
+    html += `<tr>`;
+    html += `<td>${date}</td>`;
+    html += `<td>${delivery.dr_number}</td>`;
+    html += `<td>${delivery.bottles_delivered}</td>`;
+    html += `<td>${delivery.bottles_returned}</td>`;
+    html += `<td>${net}</td>`;
+    html += `<td>₱${amount.toFixed(2)}</td>`;
+    html += `</tr>`;
+  });
+
+  html += `</tbody></table>`;
+
+  const totalNet = totalDelivered - totalReturned;
+  html += `<div class="billing-summary">`;
+  html += `<div class="billing-summary-row"><span>Total Delivered:</span><span>${totalDelivered}</span></div>`;
+  html += `<div class="billing-summary-row"><span>Total Returned:</span><span>${totalReturned}</span></div>`;
+  html += `<div class="billing-summary-row"><span>Total Net:</span><span>${totalNet}</span></div>`;
+  html += `<div class="billing-summary-row"><span>Unit Price:</span><span>₱${unitPrice.toFixed(2)}</span></div>`;
+  html += `<div class="billing-summary-row total"><span>TOTAL AMOUNT:</span><span>₱${totalAmount.toFixed(2)}</span></div>`;
+  html += `</div>`;
+
+  billingContent.innerHTML = html;
+}
+
+function printBillingStatement() {
+  window.print();
+}
+
+function downloadBillingPdf() {
+  const company = billingCompanySelect.value;
+  const startDate = billingStartDateInput.value;
+  const endDate = billingEndDateInput.value;
+  const content = billingContent.innerHTML;
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Billing Statement - ${company}</title>
+      <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        h3 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #667eea; color: white; }
+        .billing-summary { background: #f8f9fa; padding: 20px; border-radius: 8px; }
+        .billing-summary-row { display: flex; justify-content: space-between; padding: 10px 0; }
+        .billing-summary-row.total { font-weight: bold; font-size: 16px; border-top: 2px solid #667eea; padding-top: 15px; }
+      </style>
+    </head>
+    <body>
+      ${content}
+    </body>
+    </html>
+  `;
+
+  const blob = new Blob([htmlContent], { type: 'text/html' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `billing_${company}_${startDate}_${endDate}.html`;
+  a.click();
+  window.URL.revokeObjectURL(url);
+}
+
+function openAddCompanyModal() {
+  addCompanyModal.classList.remove('hidden');
+  addCompanyForm.reset();
+  addCompanyMessage.innerHTML = '';
+}
+
+function closeAddCompanyModal() {
+  addCompanyModal.classList.add('hidden');
+  addCompanyForm.reset();
+  addCompanyMessage.innerHTML = '';
+}
+
+async function submitAddCompany() {
+  const name = document.getElementById('newCompanyName').value.trim();
+  const price = document.getElementById('newCompanyPrice').value.trim();
+
+  if (!name || !price) {
+    addCompanyMessage.innerHTML = '<span style="color: #dc3545;">Please enter both name and price</span>';
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/companies', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, unitPrice: parseFloat(price) })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to add company');
+    }
+
+    const result = await response.json();
+    addCompanyMessage.innerHTML = `<span style="color: #28a745;">${result.message}</span>`;
+
+    await fetchCompanies();
+    setTimeout(() => closeAddCompanyModal(), 1000);
+  } catch (err) {
+    addCompanyMessage.innerHTML = `<span style="color: #dc3545;">Error: ${err.message}</span>`;
+  }
 }
 
 const today = new Date();

@@ -220,6 +220,20 @@ body {
   background: #218838;
 }
 
+.btn-billing,
+.btn-add-company {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.btn-billing:hover,
+.btn-add-company:hover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  transform: translateY(-2px);
+}
+
 .form-section h2,
 .table-section h2 {
   color: #667eea;
@@ -855,6 +869,76 @@ tbody tr:hover {
   justify-content: flex-end;
   gap: 10px;
   margin-top: 20px;
+}
+
+.modal-wide {
+  max-width: 900px;
+}
+
+.billing-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 15px;
+  margin-bottom: 20px;
+  align-items: flex-end;
+}
+
+.billing-controls .form-group {
+  margin-bottom: 0;
+}
+
+.billing-content {
+  margin: 20px 0;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.billing-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 13px;
+}
+
+.billing-table th {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 10px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.billing-table td {
+  padding: 10px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.billing-table tr:hover {
+  background: #f8f9fa;
+}
+
+.billing-summary {
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px solid #667eea;
+  margin-top: 20px;
+}
+
+.billing-summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #e9ecef;
+  font-size: 14px;
+}
+
+.billing-summary-row.total {
+  font-weight: 700;
+  font-size: 16px;
+  color: #667eea;
+  border-bottom: 2px solid #667eea;
+  padding-top: 15px;
 }
 
 @keyframes fadeIn {
