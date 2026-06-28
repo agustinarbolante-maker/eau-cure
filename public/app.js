@@ -950,15 +950,17 @@ function renderDailyReport(date, allDeliveries) {
   const dateFormatted = reportDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   const companiesData = {};
-  let totalBottles = 0;
+  let totalDelivered = 0;
+  let totalReturned = 0;
 
   allDeliveries.forEach(delivery => {
     if (!companiesData[delivery.company]) {
-      companiesData[delivery.company] = { quantity: 0, drNumbers: [] };
+      companiesData[delivery.company] = { delivered: 0, returned: 0 };
     }
-    companiesData[delivery.company].quantity += delivery.bottles_delivered;
-    companiesData[delivery.company].drNumbers.push(delivery.dr_number);
-    totalBottles += delivery.bottles_delivered;
+    companiesData[delivery.company].delivered += delivery.bottles_delivered;
+    companiesData[delivery.company].returned += delivery.bottles_returned;
+    totalDelivered += delivery.bottles_delivered;
+    totalReturned += delivery.bottles_returned;
   });
 
   const companies = Object.keys(companiesData).sort();
@@ -977,23 +979,24 @@ function renderDailyReport(date, allDeliveries) {
 
   html += `<table class="daily-report-table">`;
   html += `<thead><tr>`;
-  html += `<th>Company</th><th>Bottles Delivered</th><th>DR Numbers</th>`;
+  html += `<th>Company</th><th>Delivered</th><th>Returned</th>`;
   html += `</tr></thead><tbody>`;
 
   companies.forEach(company => {
     const data = companiesData[company];
     html += `<tr>`;
     html += `<td>${company}</td>`;
-    html += `<td style="color: #dc3545; font-weight: 600;">${data.quantity}</td>`;
-    html += `<td>${data.drNumbers.join(', ')}</td>`;
+    html += `<td style="color: #dc3545; font-weight: 600;">${data.delivered}</td>`;
+    html += `<td>${data.returned}</td>`;
     html += `</tr>`;
   });
 
   html += `</tbody></table>`;
 
   html += `<div class="daily-report-summary">`;
-  html += `<div class="daily-report-summary-row"><span>Total Companies Served:</span><span>${companies.length}</span></div>`;
-  html += `<div class="daily-report-summary-row total"><span>TOTAL BOTTLES DELIVERED:</span><span>${totalBottles}</span></div>`;
+  html += `<div class="daily-report-summary-row"><span>Total Delivered:</span><span style="color: #dc3545; font-weight: 600;">${totalDelivered}</span></div>`;
+  html += `<div class="daily-report-summary-row"><span>Total Returned:</span><span>${totalReturned}</span></div>`;
+  html += `<div class="daily-report-summary-row total"><span>Total Companies:</span><span>${companies.length}</span></div>`;
   html += `</div>`;
 
   dailyReportContent.innerHTML = html;
