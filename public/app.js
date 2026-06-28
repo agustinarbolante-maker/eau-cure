@@ -746,9 +746,9 @@ function renderBillingStatement(data) {
     html += `<td>${date}</td>`;
     html += `<td>${delivery.dr_number}</td>`;
     html += `<td>5 gal round</td>`;
-    html += `<td style="color: #dc3545; font-weight: 600;">${quantity}</td>`;
+    html += `<td>${quantity}</td>`;
     html += `<td>₱${price.toFixed(2)}</td>`;
-    html += `<td style="color: #dc3545; font-weight: 600;">₱${amount.toFixed(2)}</td>`;
+    html += `<td>₱${amount.toFixed(2)}</td>`;
     html += `</tr>`;
   });
 
@@ -756,8 +756,8 @@ function renderBillingStatement(data) {
 
   html += `<div class="billing-summary">`;
   html += `<div class="billing-summary-row"><span>Total Quantity:</span><span style="color: #dc3545; font-weight: 600;">${totalQuantity} bottles</span></div>`;
-  html += `<div class="billing-summary-row"><span>Unit Price:</span><span>₱${price.toFixed(2)}</span></div>`;
-  html += `<div class="billing-summary-row total"><span>TOTAL AMOUNT DUE:</span><span style="color: #dc3545;">₱${totalAmount.toFixed(2)}</span></div>`;
+  html += `<div class="billing-summary-row"><span>Unit Price:</span><span style="color: #dc3545; font-weight: 600;">₱${price.toFixed(2)}</span></div>`;
+  html += `<div class="billing-summary-row total"><span style="color: #dc3545;">TOTAL AMOUNT DUE:</span><span style="color: #dc3545;">₱${totalAmount.toFixed(2)}</span></div>`;
   html += `</div>`;
 
   billingContent.innerHTML = html;
@@ -798,9 +798,10 @@ function downloadBillingPdf() {
           <span style="color: #dc3545;">${value}</span>
         </div>`;
       } else {
+        const isColored = label.includes('Total Quantity') || label.includes('Unit Price');
         summaryHtml += `<div style="padding: 10px 0; display: flex; justify-content: space-between;">
           <span>${label}</span>
-          <span style="${label.includes('Bottle') ? 'color: #dc3545; font-weight: 600;' : 'color: #000;'}">${value}</span>
+          <span style="${isColored ? 'color: #dc3545; font-weight: 600;' : 'color: #000;'}">${value}</span>
         </div>`;
       }
     });
