@@ -145,6 +145,90 @@ function populateCompanyDropdowns() {
   populateFilterCompanyDropdown();
 }
 
+function renderDeliveryChart() {
+  const canvas = document.getElementById('deliveryChart');
+  if (!canvas) return;
+
+  // Get last 7 days of data
+  const last7Days = [];
+  const deliveryCount = [];
+
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    const count = deliveryCountByDate[dateStr] || 0;
+
+    last7Days.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+    deliveryCount.push(count);
+  }
+
+  // Get text color based on dark mode
+  const isDarkMode = document.body.classList.contains('dark-mode');
+  const textColor = isDarkMode ? '#f5f5f5' : '#333';
+
+  const ctx = canvas.getContext('2d');
+
+  // Destroy existing chart if it exists
+  if (window.deliveryChartInstance) {
+    window.deliveryChartInstance.destroy();
+  }
+
+  window.deliveryChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: last7Days,
+      datasets: [{
+        label: 'Deliveries',
+        data: deliveryCount,
+        borderColor: '#667eea',
+        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+        borderWidth: 3,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 6,
+        pointBackgroundColor: '#667eea',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointHoverRadius: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          labels: {
+            color: textColor,
+            font: { size: 14, weight: '600' }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: textColor,
+            font: { size: 12 }
+          },
+          grid: {
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+          }
+        },
+        x: {
+          ticks: {
+            color: textColor,
+            font: { size: 12 }
+          },
+          grid: {
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+          }
+        }
+      }
+    }
+  });
+}
+
 async function fetchDeliveries() {
   try {
     const response = await fetch(API_URL);
@@ -163,6 +247,7 @@ async function fetchDeliveries() {
 
     renderTable();
     renderCalendar();
+    renderDeliveryChart();
   } catch (err) {
     showMessage('Error loading deliveries: ' + err.message, 'error');
   }
@@ -680,6 +765,8 @@ function toggleDarkMode() {
   } else {
     document.body.classList.remove('dark-mode');
   }
+  // Re-render chart with new theme colors
+  renderDeliveryChart();
 }
 
 function saveSettings() {

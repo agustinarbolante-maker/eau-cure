@@ -6,6 +6,7 @@
   <title>Eau Cure - Water Station Delivery Tracker</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="app-container">
@@ -71,6 +72,11 @@
             <div class="stat-label">Net Bottles</div>
             <div class="stat-value" id="netBottles">0</div>
           </div>
+        </div>
+
+        <div class="chart-container">
+          <h3>📈 Delivery Trends (Last 7 Days)</h3>
+          <canvas id="deliveryChart"></canvas>
         </div>
       </section>
 
