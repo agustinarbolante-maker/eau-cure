@@ -1171,6 +1171,26 @@ async function deleteBillingStatement(id) {
   }
 }
 
+function switchPage(pageName) {
+  event.preventDefault();
+
+  // Update active nav item
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.remove('active');
+  });
+  event.target.classList.add('active');
+
+  // Show/hide sections based on page
+  document.getElementById('dashboardSection').style.display = pageName === 'dashboard' ? 'block' : 'none';
+  document.getElementById('filterSection').style.display = pageName === 'deliveries' ? 'block' : 'none';
+  document.querySelector('.calendar-section').style.display = pageName === 'calendar' || pageName === 'dashboard' ? 'block' : 'none';
+  document.querySelector('.form-section').style.display = pageName === 'deliveries' || pageName === 'dashboard' ? 'block' : 'none';
+  document.querySelector('.table-section').style.display = pageName === 'deliveries' ? 'block' : 'none';
+  document.getElementById('billingModal').parentElement.style.display = pageName === 'billing' ? 'block' : 'none';
+
+  console.log('Switched to page:', pageName);
+}
+
 function switchDashboardTab(tabName) {
   // Update active tab
   document.querySelectorAll('.dashboard-tab').forEach(tab => {
@@ -1180,7 +1200,6 @@ function switchDashboardTab(tabName) {
 
   // Show/hide content based on tab
   console.log('Switched to tab:', tabName);
-  // You can add different content for each tab here
 }
 
 const today = new Date();
