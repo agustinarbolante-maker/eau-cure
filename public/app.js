@@ -1180,15 +1180,57 @@ function switchPage(pageName) {
   });
   event.target.classList.add('active');
 
+  // Close any open modals
+  document.querySelectorAll('.modal').forEach(modal => {
+    modal.classList.add('hidden');
+  });
+
   // Show/hide sections based on page
   document.getElementById('dashboardSection').style.display = pageName === 'dashboard' ? 'block' : 'none';
   document.getElementById('filterSection').style.display = pageName === 'deliveries' ? 'block' : 'none';
-  document.querySelector('.calendar-section').style.display = pageName === 'calendar' || pageName === 'dashboard' ? 'block' : 'none';
-  document.querySelector('.form-section').style.display = pageName === 'deliveries' || pageName === 'dashboard' ? 'block' : 'none';
+  document.querySelector('.calendar-section').style.display = pageName === 'dashboard' ? 'block' : 'none';
+  document.querySelector('.form-section').style.display = pageName === 'deliveries' ? 'block' : 'none';
   document.querySelector('.table-section').style.display = pageName === 'deliveries' ? 'block' : 'none';
-  document.getElementById('billingModal').parentElement.style.display = pageName === 'billing' ? 'block' : 'none';
+
+  // Show company list for companies page
+  const companySection = document.createElement('div');
+  if (pageName === 'companies') {
+    showCompanyList();
+  }
+
+  // Show billing for billing page
+  if (pageName === 'billing') {
+    openBillingHistoryModal();
+  }
 
   console.log('Switched to page:', pageName);
+}
+
+async function showCompanyList() {
+  try {
+    const response = await fetch('/api/companies/all');
+    if (!response.ok) throw new Error('Failed to load companies');
+    const companies = await response.json();
+
+    let html = '<section class="form-section"><h2>👥 Companies</h2>';
+    html += '<table style="width: 100%; border-collapse: collapse;">';
+    html += '<thead><tr style="background: #f0f0f0;"><th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Company Name</th><th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Unit Price (₱)</th></tr></thead>';
+    html += '<tbody>';
+
+    companies.forEach(company => {
+      html += `<tr style="border: 1px solid #ddd;"><td style="padding: 12px; border: 1px solid #ddd;">${company.name}</td><td style="padding: 12px; border: 1px solid #ddd;">₱${parseFloat(company.unit_price).toFixed(2)}</td></tr>`;
+    });
+
+    html += '</tbody></table></section>';
+
+    // Replace form section with company list
+    const formSection = document.querySelector('.form-section');
+    if (formSection) {
+      formSection.innerHTML = html.substring(html.indexOf('<h2>'));
+    }
+  } catch (err) {
+    console.error('Error loading companies:', err);
+  }
 }
 
 function switchDashboardTab(tabName) {
