@@ -8,18 +8,33 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-  <div class="container">
-    <header class="header">
-      <div class="header-top">
-        <div>
-          <h1>Eau Cure - Water Station Delivery Tracker</h1>
-          <p>Track and manage all water deliveries</p>
-        </div>
-        <button type="button" class="btn btn-settings" id="settingsHeaderBtn" title="Settings">⚙️ Settings</button>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1>💧 Eau Cure</h1>
       </div>
-    </header>
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active">📊 Dashboard</a>
+        <a href="#" class="nav-item">📋 Deliveries</a>
+        <a href="#" class="nav-item">📦 Calendar</a>
+        <a href="#" class="nav-item">👥 Companies</a>
+        <a href="#" class="nav-item">📄 Billing</a>
+        <a href="#" class="nav-item">📈 Analytics</a>
+        <a href="#" class="nav-item">⚙️ Settings</a>
+      </nav>
+    </aside>
 
-    <main class="main-content">
+    <div class="main-wrapper">
+      <header class="header">
+        <div class="header-top">
+          <div>
+            <h1>Water Station Delivery Tracker</h1>
+            <p>Track and manage all water deliveries</p>
+          </div>
+        </div>
+      </header>
+
+      <main class="main-content">
       <section class="dashboard-section" id="dashboardSection">
         <div class="dashboard-header">
           <h2>📊 Dashboard</h2>
@@ -165,6 +180,7 @@
         </div>
       </section>
     </main>
+    </div>
   </div>
 
   <div id="settingsModal" class="modal hidden">
