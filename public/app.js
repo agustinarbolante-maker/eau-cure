@@ -107,7 +107,8 @@ async function fetchDeliveries() {
     }
 
     deliveries.forEach(delivery => {
-      const dateStr = delivery.timestamp.split('T')[0];
+      const deliveryDate = new Date(delivery.timestamp);
+      const dateStr = `${deliveryDate.getFullYear()}-${String(deliveryDate.getMonth() + 1).padStart(2, '0')}-${String(deliveryDate.getDate()).padStart(2, '0')}`;
       deliveryCountByDate[dateStr] = (deliveryCountByDate[dateStr] || 0) + 1;
     });
 
@@ -205,7 +206,7 @@ function renderCalendar() {
 
   for (let day = 1; day <= daysInMonth; day++) {
     const date = new Date(year, month, day);
-    const dateStr = date.toISOString().split('T')[0];
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     const isSelected = date.toDateString() === selectedDateForDeliveries.toDateString();
     const isToday = date.toDateString() === new Date().toDateString();
 
@@ -640,7 +641,9 @@ function saveSettings() {
   closeSettingsModal();
 }
 
-selectDateFromCalendar(new Date().toISOString().split('T')[0]);
+const today = new Date();
+const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+selectDateFromCalendar(todayStr);
 
 fetchCompanies();
 fetchDeliveries();
