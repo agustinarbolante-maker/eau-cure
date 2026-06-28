@@ -146,6 +146,42 @@
         <div id="formMessage" class="form-message"></div>
       </section>
 
+      <section class="settings-page" id="settingsPage" style="display: none;">
+        <h2>⚙️ Settings</h2>
+        <div class="settings-content">
+          <div class="settings-group">
+            <div class="form-group">
+              <label for="settingsDefaultCompany">Default Company:</label>
+              <select id="settingsDefaultCompany">
+                <option value="">None</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="settingsRowsPerPage">Rows Per Page:</label>
+              <select id="settingsRowsPerPage">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+            <div class="form-group checkbox">
+              <label>
+                <input type="checkbox" id="settingsAutoRefresh">
+                Auto-refresh stats every 30 seconds
+              </label>
+            </div>
+            <div class="form-group checkbox">
+              <label>
+                <input type="checkbox" id="settingsDarkMode">
+                🌙 Dark Mode
+              </label>
+            </div>
+          </div>
+          <button type="button" class="btn btn-submit" id="saveSettingsBtnPage">Save Settings</button>
+        </div>
+      </section>
+
       <section class="table-section">
         <div class="section-header">
           <h2>Delivery Records</h2>

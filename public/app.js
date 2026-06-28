@@ -92,6 +92,8 @@ if (settingsHeaderBtn && settingsHeaderBtn.addEventListener) {
 if (closeSettingsModalBtn) closeSettingsModalBtn.addEventListener('click', closeSettingsModal);
 if (closeSettingsModal2Btn) closeSettingsModal2Btn.addEventListener('click', closeSettingsModal);
 saveSettingsBtn.addEventListener('click', saveSettings);
+const saveSettingsBtnPage = document.getElementById('saveSettingsBtnPage');
+if (saveSettingsBtnPage) saveSettingsBtnPage.addEventListener('click', saveSettings);
 if (settingsDarkMode) settingsDarkMode.addEventListener('change', toggleDarkMode);
 prevMonthBtn.addEventListener('click', () => {
   currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
@@ -1257,9 +1259,16 @@ function switchPage(pageName) {
     showBillingPage();
   }
 
-  // SETTINGS: Open settings modal
+  // SETTINGS: Show settings page
   if (pageName === 'settings') {
-    openSettingsModal();
+    const settingsPage = document.getElementById('settingsPage');
+    if (settingsPage) {
+      settingsPage.style.display = 'block';
+      loadSettings();
+    }
+  } else {
+    const settingsPage = document.getElementById('settingsPage');
+    if (settingsPage) settingsPage.style.display = 'none';
   }
 
   console.log('Switched to page:', pageName);
