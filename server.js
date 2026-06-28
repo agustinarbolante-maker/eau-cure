@@ -22,8 +22,36 @@ app.get('/api/companies', (req, res) => {
 
 app.get('/api/deliveries', async (req, res) => {
   try {
-    const deliveries = await db.getAllDeliveries();
+    const { company, startDate, endDate } = req.query;
+
+    let deliveries;
+    if (company || startDate || endDate) {
+      deliveries = await db.getDeliveriesByFilters(company, startDate, endDate);
+    } else {
+      deliveries = await db.getAllDeliveries();
+    }
+
     res.json(deliveries);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/stats', async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    const stats = await db.getStats(startDate, endDate);
+    res.json(stats);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/stats/companies', async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    const stats = await db.getCompanyStats(startDate, endDate);
+    res.json(stats);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

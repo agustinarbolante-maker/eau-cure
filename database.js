@@ -98,6 +98,87 @@ function getCompanies() {
   return COMPANIES;
 }
 
+function getDeliveriesByFilters(company, startDate, endDate) {
+  return new Promise((resolve, reject) => {
+    let query = 'SELECT * FROM deliveries WHERE 1=1';
+    const params = [];
+
+    if (company && company.trim()) {
+      query += ' AND company = ?';
+      params.push(company);
+    }
+
+    if (startDate) {
+      query += ' AND timestamp >= ?';
+      params.push(startDate + 'T00:00:00');
+    }
+
+    if (endDate) {
+      query += ' AND timestamp <= ?';
+      params.push(endDate + 'T23:59:59');
+    }
+
+    query += ' ORDER BY timestamp DESC';
+
+    db.all(query, params, (err, rows) => {
+      if (err) reject(err);
+      else resolve(rows || []);
+    });
+  });
+}
+
+function getStats(startDate, endDate) {
+  return new Promise((resolve, reject) => {
+    let query = 'SELECT COUNT(*) as total_deliveries, SUM(bottles_delivered) as total_delivered, SUM(bottles_returned) as total_returned FROM deliveries WHERE 1=1';
+    const params = [];
+
+    if (startDate) {
+      query += ' AND timestamp >= ?';
+      params.push(startDate + 'T00:00:00');
+    }
+
+    if (endDate) {
+      query += ' AND timestamp <= ?';
+      params.push(endDate + 'T23:59:59');
+    }
+
+    db.get(query, params, (err, row) => {
+      if (err) reject(err);
+      else resolve(row);
+    });
+  });
+}
+
+function getCompanyStats(startDate, endDate) {
+  return new Promise((resolve, reject) => {
+    let query = `
+      SELECT company, COUNT(*) as delivery_count,
+             SUM(bottles_delivered) as total_delivered,
+             SUM(bottles_returned) as total_returned
+      FROM deliveries
+      WHERE 1=1
+    `;
+    const params = [];
+
+    if (startDate) {
+      query += ' AND timestamp >= ?';
+      params.push(startDate + 'T00:00:00');
+    }
+
+    if (endDate) {
+      query += ' AND timestamp <= ?';
+      params.push(endDate + 'T23:59:59');
+    }
+
+    query += ' GROUP BY company ORDER BY delivery_count DESC';
+
+    db.all(query, params, (err, rows) => {
+      if (err) reject(err);
+      else resolve(rows || []);
+    });
+  });
+}
+
 function createBackupDirectory() {
   if (!fs.existsSync(BACKUP_DIR)) {
     fs.mkdirSync(BACKUP_DIR, { recursive: true });
@@ -204,6 +285,9 @@ module.exports = {
   updateDelivery,
   deleteDelivery,
   getCompanies,
+  getDeliveriesByFilters,
+  getStats,
+  getCompanyStats,
   performBackup,
   listBackups,
   restoreBackup

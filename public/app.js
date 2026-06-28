@@ -19,6 +19,12 @@ const closeBackupModalBtn = document.getElementById('closeBackupModal');
 const closeBackupModal2Btn = document.getElementById('closeBackupModal2');
 const manualBackupBtn = document.getElementById('manualBackupBtn');
 const backupList = document.getElementById('backupList');
+const companyStatsModal = document.getElementById('companyStatsModal');
+const closeCompanyStatsModalBtn = document.getElementById('closeCompanyStatsModal');
+const closeCompanyStatsModal2Btn = document.getElementById('closeCompanyStatsModal2');
+const filterCompanySelect = document.getElementById('filterCompany');
+const filterStartDateInput = document.getElementById('filterStartDate');
+const filterEndDateInput = document.getElementById('filterEndDate');
 
 deliveryForm.addEventListener('submit', handleFormSubmit);
 editForm.addEventListener('submit', handleEditSubmit);
@@ -28,6 +34,8 @@ backupBtn.addEventListener('click', openBackupModal);
 closeBackupModalBtn.addEventListener('click', closeBackupModal);
 closeBackupModal2Btn.addEventListener('click', closeBackupModal);
 manualBackupBtn.addEventListener('click', createManualBackup);
+closeCompanyStatsModalBtn.addEventListener('click', closeCompanyStatsModal);
+closeCompanyStatsModal2Btn.addEventListener('click', closeCompanyStatsModal);
 
 async function fetchCompanies() {
   try {
@@ -47,6 +55,7 @@ function populateCompanyDropdowns() {
 
   companySelect.innerHTML = '<option value="">-- Select a Company --</option>' + options;
   editCompanySelect.innerHTML = '<option value="">-- Select a Company --</option>' + options;
+  populateFilterCompanyDropdown();
 }
 
 async function fetchDeliveries() {
@@ -262,6 +271,126 @@ async function restoreBackup(filename) {
 
 function downloadBackup(filename) {
   window.location.href = `/api/backups/download/${filename}`;
+}
+
+function populateFilterCompanyDropdown() {
+  const options = companies.map(company =>
+    `<option value="${company}">${company}</option>`
+  ).join('');
+  filterCompanySelect.innerHTML = '<option value="">All Companies</option>' + options;
+}
+
+async function applyFilters() {
+  const company = filterCompanySelect.value;
+  const startDate = filterStartDateInput.value;
+  const endDate = filterEndDateInput.value;
+
+  try {
+    let url = '/api/deliveries?';
+    if (company) url += `company=${encodeURIComponent(company)}&`;
+    if (startDate) url += `startDate=${startDate}&`;
+    if (endDate) url += `endDate=${endDate}&`;
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Failed to filter deliveries');
+    deliveries = await response.json();
+    renderTable();
+
+    await loadStats(startDate, endDate);
+  } catch (err) {
+    showMessage('Error filtering data: ' + err.message, 'error');
+  }
+}
+
+function resetFilters() {
+  filterCompanySelect.value = '';
+  filterStartDateInput.value = '';
+  filterEndDateInput.value = '';
+  applyFilters();
+}
+
+async function loadStats(startDate, endDate) {
+  try {
+    let url = '/api/stats?';
+    if (startDate) url += `startDate=${startDate}&`;
+    if (endDate) url += `endDate=${endDate}&`;
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Failed to load stats');
+    const stats = await response.json();
+
+    document.getElementById('totalDeliveries').textContent = stats.total_deliveries || 0;
+    document.getElementById('totalDelivered').textContent = stats.total_delivered || 0;
+    document.getElementById('totalReturned').textContent = stats.total_returned || 0;
+
+    const net = (stats.total_delivered || 0) - (stats.total_returned || 0);
+    document.getElementById('netBottles').textContent = net;
+  } catch (err) {
+    console.error('Error loading stats:', err);
+  }
+}
+
+function filterQuickRange(range) {
+  const end = new Date();
+  const start = new Date();
+
+  switch (range) {
+    case 'today':
+      start.setHours(0, 0, 0, 0);
+      break;
+    case 'week':
+      start.setDate(end.getDate() - 7);
+      break;
+    case 'month':
+      start.setMonth(end.getMonth() - 1);
+      break;
+    case 'all':
+      filterStartDateInput.value = '';
+      filterEndDateInput.value = '';
+      applyFilters();
+      return;
+  }
+
+  filterStartDateInput.value = start.toISOString().split('T')[0];
+  filterEndDateInput.value = end.toISOString().split('T')[0];
+  applyFilters();
+}
+
+function closeCompanyStatsModal() {
+  companyStatsModal.classList.add('hidden');
+}
+
+async function openCompanyStatsModal() {
+  companyStatsModal.classList.remove('hidden');
+  try {
+    const startDate = filterStartDateInput.value;
+    const endDate = filterEndDateInput.value;
+
+    let url = '/api/stats/companies?';
+    if (startDate) url += `startDate=${startDate}&`;
+    if (endDate) url += `endDate=${endDate}&`;
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Failed to load company stats');
+    const stats = await response.json();
+
+    const tbody = document.getElementById('companyStatsBody');
+    if (stats.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" class="loading">No data available</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = stats.map(stat => `
+      <tr>
+        <td>${stat.company}</td>
+        <td>${stat.delivery_count}</td>
+        <td>${stat.total_delivered || 0}</td>
+        <td>${stat.total_returned || 0}</td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    showMessage('Error loading company stats: ' + err.message, 'error');
+  }
 }
 
 fetchCompanies();

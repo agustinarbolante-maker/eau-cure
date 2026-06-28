@@ -14,6 +14,58 @@
     </header>
 
     <main class="main-content">
+      <section class="dashboard-section" id="dashboardSection">
+        <div class="dashboard-header">
+          <h2>📊 Summary</h2>
+          <div class="quick-filters">
+            <button type="button" class="btn btn-filter" onclick="filterQuickRange('today')">Today</button>
+            <button type="button" class="btn btn-filter" onclick="filterQuickRange('week')">This Week</button>
+            <button type="button" class="btn btn-filter" onclick="filterQuickRange('month')">This Month</button>
+            <button type="button" class="btn btn-filter" onclick="filterQuickRange('all')">All Time</button>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total Deliveries</div>
+            <div class="stat-value" id="totalDeliveries">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Bottles Delivered</div>
+            <div class="stat-value" id="totalDelivered">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Bottles Returned</div>
+            <div class="stat-value" id="totalReturned">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Net Bottles</div>
+            <div class="stat-value" id="netBottles">0</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="filter-section">
+        <h2>🔍 Filters</h2>
+        <div class="filter-controls">
+          <div class="filter-group">
+            <label for="filterCompany">Company:</label>
+            <select id="filterCompany" onchange="applyFilters()">
+              <option value="">All Companies</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="filterStartDate">From:</label>
+            <input type="date" id="filterStartDate" onchange="applyFilters()">
+          </div>
+          <div class="filter-group">
+            <label for="filterEndDate">To:</label>
+            <input type="date" id="filterEndDate" onchange="applyFilters()">
+          </div>
+          <button type="button" class="btn btn-reset" onclick="resetFilters()">Reset Filters</button>
+          <button type="button" class="btn btn-stats" onclick="openCompanyStatsModal()">📈 Company Stats</button>
+        </div>
+      </section>
+
       <section class="form-section">
         <h2>New Delivery Entry</h2>
         <form id="deliveryForm">
@@ -71,6 +123,35 @@
         </div>
       </section>
     </main>
+  </div>
+
+  <div id="companyStatsModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Company Statistics</h2>
+        <button type="button" class="modal-close" id="closeCompanyStatsModal">&times;</button>
+      </div>
+      <div class="company-stats-content">
+        <table class="company-stats-table">
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Deliveries</th>
+              <th>Bottles Delivered</th>
+              <th>Bottles Returned</th>
+            </tr>
+          </thead>
+          <tbody id="companyStatsBody">
+            <tr>
+              <td colspan="4" class="loading">Loading...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn btn-cancel" id="closeCompanyStatsModal2">Close</button>
+      </div>
+    </div>
   </div>
 
   <div id="backupModal" class="modal hidden">
