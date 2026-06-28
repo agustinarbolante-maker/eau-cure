@@ -134,6 +134,17 @@ body {
   flex: 1;
 }
 
+.main-content.deliveries-layout {
+  grid-template-columns: 260px 1fr;
+}
+
+.main-content.deliveries-layout .calendar-section {
+  grid-row: 1 / -1;
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+}
+
 .dashboard-section,
 .filter-section,
 .form-section,

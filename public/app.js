@@ -1188,11 +1188,21 @@ function switchPage(pageName) {
   });
 
   // Show/hide sections based on page
+  const mainContent = document.querySelector('.main-content');
   const dashboardSection = document.getElementById('dashboardSection');
   const filterSection = document.querySelector('.filter-section');
   const calendarSection = document.querySelector('.calendar-section');
   const formSection = document.querySelector('.form-section');
   const tableSection = document.querySelector('.table-section');
+
+  // Update main-content layout
+  if (mainContent) {
+    if (pageName === 'deliveries') {
+      mainContent.classList.add('deliveries-layout');
+    } else {
+      mainContent.classList.remove('deliveries-layout');
+    }
+  }
 
   // DASHBOARD: Only stats
   if (dashboardSection) dashboardSection.style.display = pageName === 'dashboard' ? 'block' : 'none';
@@ -1205,7 +1215,10 @@ function switchPage(pageName) {
 
   // COMPANIES: Company list
   if (pageName === 'companies') {
+    if (filterSection) filterSection.style.display = 'none';
+    if (calendarSection) calendarSection.style.display = 'none';
     if (formSection) formSection.style.display = 'block';
+    if (tableSection) tableSection.style.display = 'none';
     showCompanyList();
   }
 
@@ -1269,7 +1282,7 @@ async function showCompanyList() {
     if (!response.ok) throw new Error('Failed to load companies');
     const companies = await response.json();
 
-    let html = '<section class="form-section"><h2>👥 Companies</h2>';
+    let html = '<h2>👥 Companies</h2>';
     html += '<table style="width: 100%; border-collapse: collapse;">';
     html += '<thead><tr style="background: #f0f0f0;"><th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Company Name</th><th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Unit Price (₱)</th></tr></thead>';
     html += '<tbody>';
@@ -1278,7 +1291,7 @@ async function showCompanyList() {
       html += `<tr style="border: 1px solid #ddd;"><td style="padding: 12px; border: 1px solid #ddd;">${company.name}</td><td style="padding: 12px; border: 1px solid #ddd;">₱${parseFloat(company.unit_price).toFixed(2)}</td></tr>`;
     });
 
-    html += '</tbody></table></section>';
+    html += '</tbody></table>';
 
     // Replace form section with company list
     const formSection = document.querySelector('.form-section');
