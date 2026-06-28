@@ -1171,6 +1171,18 @@ async function deleteBillingStatement(id) {
   }
 }
 
+function switchDashboardTab(tabName) {
+  // Update active tab
+  document.querySelectorAll('.dashboard-tab').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  event.target.classList.add('active');
+
+  // Show/hide content based on tab
+  console.log('Switched to tab:', tabName);
+  // You can add different content for each tab here
+}
+
 const today = new Date();
 const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 selectDateFromCalendar(todayStr);

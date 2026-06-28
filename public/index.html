@@ -22,13 +22,19 @@
     <main class="main-content">
       <section class="dashboard-section" id="dashboardSection">
         <div class="dashboard-header">
-          <h2>📊 Summary</h2>
-          <div class="quick-filters">
-            <button type="button" class="btn btn-filter" onclick="filterQuickRange('today')">Today</button>
-            <button type="button" class="btn btn-filter" onclick="filterQuickRange('week')">This Week</button>
-            <button type="button" class="btn btn-filter" onclick="filterQuickRange('month')">This Month</button>
-            <button type="button" class="btn btn-filter" onclick="filterQuickRange('all')">All Time</button>
-          </div>
+          <h2>📊 Dashboard</h2>
+        </div>
+        <div class="dashboard-tabs">
+          <button type="button" class="dashboard-tab active" onclick="switchDashboardTab('overview')">Overview</button>
+          <button type="button" class="dashboard-tab" onclick="switchDashboardTab('deliveries')">Deliveries</button>
+          <button type="button" class="dashboard-tab" onclick="switchDashboardTab('returns')">Returns</button>
+          <button type="button" class="dashboard-tab" onclick="switchDashboardTab('analytics')">Analytics</button>
+        </div>
+        <div class="quick-filters">
+          <button type="button" class="btn btn-filter" onclick="filterQuickRange('today')">Today</button>
+          <button type="button" class="btn btn-filter" onclick="filterQuickRange('week')">This Week</button>
+          <button type="button" class="btn btn-filter" onclick="filterQuickRange('month')">This Month</button>
+          <button type="button" class="btn btn-filter" onclick="filterQuickRange('all')">All Time</button>
         </div>
         <div class="stats-grid">
           <div class="stat-card stat-card-blue">
