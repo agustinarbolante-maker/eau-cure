@@ -64,9 +64,19 @@ body {
 
 .main-content {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 280px 1fr;
   gap: 20px;
   padding: 30px;
+}
+
+.dashboard-section,
+.filter-section {
+  grid-column: 1 / -1;
+}
+
+.form-section,
+.table-section {
+  grid-column: 2;
 }
 
 .dashboard-section,
@@ -544,6 +554,8 @@ body {
   height: fit-content;
   position: sticky;
   top: 20px;
+  grid-column: 1;
+  grid-row: 3 / span 2;
 }
 
 .calendar-section h2 {
@@ -856,9 +868,21 @@ tbody tr:hover {
     grid-template-columns: 1fr;
   }
 
+  .dashboard-section,
+  .filter-section {
+    grid-column: 1;
+  }
+
+  .form-section,
+  .table-section {
+    grid-column: 1;
+  }
+
   .calendar-section {
     position: static;
     height: auto;
+    grid-column: 1;
+    grid-row: auto;
   }
 }
 
