@@ -77,11 +77,13 @@ nextMonthBtn.addEventListener('click', () => {
 async function fetchCompanies() {
   try {
     const response = await fetch(COMPANIES_API);
-    if (!response.ok) throw new Error('Failed to fetch companies');
+    if (!response.ok) throw new Error('Failed to fetch companies: ' + response.status);
     companies = await response.json();
+    console.log('Companies loaded:', companies.length);
     populateCompanyDropdowns();
   } catch (err) {
     console.error('Error loading companies:', err);
+    showMessage('Error loading companies: ' + err.message, 'error');
   }
 }
 
@@ -191,7 +193,6 @@ function renderCalendar() {
 
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const daysInPrevMonth = new Date(year, month, 0).getDate();
 
   let html = '<div class="calendar-grid">';
 
@@ -214,8 +215,7 @@ function renderCalendar() {
     const countBadge = count > 0 ? `<span class="delivery-count">${count}</span>` : '';
 
     html += `
-      <div class="calendar-day ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''}"
-           onclick="selectDateFromCalendar('${dateStr}')">
+      <div class="calendar-day ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''}" data-date="${dateStr}">
         <div class="day-number">${day}</div>
         ${countBadge}
       </div>
@@ -228,6 +228,15 @@ function renderCalendar() {
 
   html += '</div>';
   calendar.innerHTML = html;
+
+  document.querySelectorAll('.calendar-day:not(.other-month)').forEach(dayEl => {
+    dayEl.addEventListener('click', function() {
+      const dateStr = this.getAttribute('data-date');
+      if (dateStr) {
+        selectDateFromCalendar(dateStr);
+      }
+    });
+  });
 }
 
 async function handleEditSubmit(e) {
