@@ -2,10 +2,46 @@
   "name": "eau-cure-water-station",
   "version": "1.0.0",
   "description": "Water station delivery tracking database",
-  "main": "server.js",
+  "main": "main.js",
+  "homepage": "./",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "electron .",
+    "dev": "electron .",
+    "server": "node server.js",
+    "build": "electron-builder"
+  },
+  "build": {
+    "appId": "com.eaucure.waterstation",
+    "productName": "Eau Cure",
+    "files": [
+      "main.js",
+      "preload.js",
+      "server.js",
+      "database.js",
+      "data/**",
+      "public/**",
+      "node_modules/**"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        "portable"
+      ],
+      "certificateFile": null,
+      "certificatePassword": null
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Eau Cure"
+    }
   },
   "keywords": [
     "water",
@@ -21,5 +57,10 @@
     "express": "^4.18.2",
     "sqlite3": "^5.1.6",
     "sweetalert2": "^11.26.25"
+  },
+  "devDependencies": {
+    "electron": "^42.5.0",
+    "electron-builder": "^26.15.3",
+    "electron-is-dev": "^3.0.1"
   }
 }
