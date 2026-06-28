@@ -35,6 +35,7 @@ const saveSettingsBtn = document.getElementById('saveSettingsBtn');
 const settingsDefaultCompany = document.getElementById('settingsDefaultCompany');
 const settingsRowsPerPage = document.getElementById('settingsRowsPerPage');
 const settingsAutoRefresh = document.getElementById('settingsAutoRefresh');
+const settingsDarkMode = document.getElementById('settingsDarkMode');
 const deliveryTime = document.getElementById('deliveryTime');
 const calendar = document.getElementById('calendar');
 const calendarMonth = document.getElementById('calendarMonth');
@@ -91,6 +92,7 @@ if (settingsHeaderBtn && settingsHeaderBtn.addEventListener) {
 if (closeSettingsModalBtn) closeSettingsModalBtn.addEventListener('click', closeSettingsModal);
 if (closeSettingsModal2Btn) closeSettingsModal2Btn.addEventListener('click', closeSettingsModal);
 saveSettingsBtn.addEventListener('click', saveSettings);
+if (settingsDarkMode) settingsDarkMode.addEventListener('change', toggleDarkMode);
 prevMonthBtn.addEventListener('click', () => {
   currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
   renderCalendar();
@@ -657,6 +659,7 @@ function loadSettings() {
   settingsDefaultCompany.value = settings.defaultCompany || '';
   settingsRowsPerPage.value = settings.rowsPerPage || '10';
   settingsAutoRefresh.checked = settings.autoRefresh || false;
+  settingsDarkMode.checked = settings.darkMode || false;
 }
 
 function openSettingsModal() {
@@ -668,11 +671,21 @@ function closeSettingsModal() {
   settingsModal.classList.add('hidden');
 }
 
+function toggleDarkMode() {
+  const isDarkMode = settingsDarkMode.checked;
+  if (isDarkMode) {
+    document.body.classList.add('dark-mode');
+  } else {
+    document.body.classList.remove('dark-mode');
+  }
+}
+
 function saveSettings() {
   const settings = {
     defaultCompany: settingsDefaultCompany.value,
     rowsPerPage: settingsRowsPerPage.value,
-    autoRefresh: settingsAutoRefresh.checked
+    autoRefresh: settingsAutoRefresh.checked,
+    darkMode: settingsDarkMode.checked
   };
 
   localStorage.setItem('eauCureSettings', JSON.stringify(settings));
@@ -681,6 +694,8 @@ function saveSettings() {
     filterCompanySelect.value = settings.defaultCompany;
     applyFilters();
   }
+
+  toggleDarkMode();
 
   Swal.fire('Saved!', 'Settings saved successfully.', 'success');
   closeSettingsModal();
@@ -1423,6 +1438,13 @@ function initPage() {
   if (calendarSection) calendarSection.style.display = 'none';
   if (formSection) formSection.style.display = 'none';
   if (tableSection) tableSection.style.display = 'none';
+}
+
+// Load dark mode preference on startup
+const savedSettings = JSON.parse(localStorage.getItem('eauCureSettings') || '{}');
+if (savedSettings.darkMode) {
+  document.body.classList.add('dark-mode');
+  if (settingsDarkMode) settingsDarkMode.checked = true;
 }
 
 const today = new Date();
