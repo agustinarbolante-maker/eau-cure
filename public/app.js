@@ -1412,7 +1412,10 @@ async function showCompanyList() {
     if (!response.ok) throw new Error('Failed to load companies');
     const companies = await response.json();
 
-    let html = '<h2>👥 Companies</h2>';
+    let html = '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">';
+    html += '<h2 style="margin: 0;">👥 Companies</h2>';
+    html += '<button type="button" class="btn btn-add-company" onclick="openAddCompanyModal()">➕ Add Company</button>';
+    html += '</div>';
     html += '<table style="width: 100%; border-collapse: collapse;">';
     html += '<thead><tr style="background: #f0f0f0;"><th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Company Name</th><th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Unit Price (₱)</th></tr></thead>';
     html += '<tbody>';
@@ -1426,7 +1429,7 @@ async function showCompanyList() {
     // Replace form section with company list
     const formSection = document.querySelector('.form-section');
     if (formSection) {
-      formSection.innerHTML = html.substring(html.indexOf('<h2>'));
+      formSection.innerHTML = html.substring(html.indexOf('<div'));
     }
   } catch (err) {
     console.error('Error loading companies:', err);
