@@ -547,23 +547,26 @@ body {
 }
 
 .calendar-section {
-  background: #f8f9fa;
-  padding: 25px;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
   height: fit-content;
   position: sticky;
   top: 20px;
   grid-column: 1;
   grid-row: 3 / span 2;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
 .calendar-section h2 {
-  color: #667eea;
-  margin-bottom: 20px;
-  font-size: 20px;
-  border-bottom: 2px solid #667eea;
-  padding-bottom: 10px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .calendar-controls {
@@ -575,113 +578,132 @@ body {
 }
 
 .calendar-month {
-  font-weight: 600;
+  font-weight: 700;
   color: #333;
-  font-size: 16px;
+  font-size: 15px;
   min-width: 150px;
   text-align: center;
-}
-
-.btn-nav {
-  background: #667eea;
-  color: white;
-  padding: 8px 12px;
-  font-size: 12px;
   flex: 1;
 }
 
+.btn-nav {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  flex: 0.8;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+  min-height: 40px;
+}
+
 .btn-nav:hover {
-  background: #764ba2;
   transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 5px;
+  gap: 6px;
   margin-bottom: 20px;
 }
 
 .calendar-day-header {
-  font-weight: 600;
+  font-weight: 700;
   color: #667eea;
   text-align: center;
-  padding: 8px 0;
-  font-size: 12px;
+  padding: 10px 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .calendar-day {
   aspect-ratio: 1;
-  border: 2px solid #dee2e6;
-  border-radius: 5px;
+  border: 2px solid #e8e8e8;
+  border-radius: 8px;
   padding: 5px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.25s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
   background: white;
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .calendar-day.other-month {
-  background: #f0f0f0;
+  background: #f8f9fa;
   cursor: default;
-  border-color: #e0e0e0;
+  border-color: #f0f0f0;
+  color: #ccc;
+  box-shadow: none;
 }
 
 .calendar-day:not(.other-month):hover {
   border-color: #667eea;
-  background: #f0f4ff;
-  transform: scale(1.05);
+  background: linear-gradient(135deg, #f5f7ff 0%, #faf8ff 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.2);
 }
 
 .calendar-day.selected {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border-color: #667eea;
-  font-weight: bold;
+  font-weight: 700;
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.35);
 }
 
-.calendar-day.today {
+.calendar-day.today:not(.selected) {
   border-color: #28a745;
-  border-width: 3px;
+  border-width: 2px;
+  background: linear-gradient(135deg, #f0fff4 0%, #f8fffe 100%);
 }
 
 .day-number {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .delivery-count {
-  background: #dc3545;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
   color: white;
   border-radius: 50%;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 10px;
-  font-weight: bold;
+  font-weight: 800;
   position: absolute;
-  bottom: 2px;
-  right: 2px;
+  bottom: 1px;
+  right: 1px;
+  box-shadow: 0 2px 6px rgba(255, 82, 82, 0.4);
 }
 
 .calendar-day.selected .delivery-count {
   background: rgba(255, 255, 255, 0.3);
-  color: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .selected-date-display {
-  background: white;
-  padding: 12px;
-  border-radius: 5px;
+  background: linear-gradient(135deg, #f5f7ff 0%, #faf8ff 100%);
+  padding: 14px 16px;
+  border-radius: 8px;
   border-left: 4px solid #667eea;
   color: #333;
   font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
 }
 
 .form-selected-date {
@@ -689,10 +711,12 @@ body {
   text-align: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 12px;
-  border-radius: 5px;
+  padding: 14px 16px;
+  border-radius: 8px;
   margin-bottom: 20px;
   font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .form-message {
