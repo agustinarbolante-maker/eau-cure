@@ -1195,30 +1195,40 @@ function switchPage(pageName) {
   const formSection = document.querySelector('.form-section');
   const tableSection = document.querySelector('.table-section');
 
+  // Reset all sections first
+  if (dashboardSection) dashboardSection.style.display = 'none';
+  if (filterSection) filterSection.style.display = 'none';
+  if (calendarSection) calendarSection.style.display = 'none';
+  if (formSection) formSection.style.display = 'none';
+  if (tableSection) tableSection.style.display = 'none';
+
   // Update main-content layout
   if (mainContent) {
-    if (pageName === 'deliveries') {
-      mainContent.classList.add('deliveries-layout');
-    } else {
-      mainContent.classList.remove('deliveries-layout');
-    }
+    mainContent.classList.remove('deliveries-layout');
   }
 
   // DASHBOARD: Only stats
-  if (dashboardSection) dashboardSection.style.display = pageName === 'dashboard' ? 'block' : 'none';
+  if (pageName === 'dashboard') {
+    if (dashboardSection) dashboardSection.style.display = 'block';
+  }
 
-  // DELIVERIES: Calendar + Filters + Form + Table
-  if (filterSection) filterSection.style.display = pageName === 'deliveries' ? 'block' : 'none';
-  if (calendarSection) calendarSection.style.display = pageName === 'deliveries' ? 'block' : 'none';
-  if (formSection) formSection.style.display = pageName === 'deliveries' ? 'block' : 'none';
-  if (tableSection) tableSection.style.display = pageName === 'deliveries' ? 'block' : 'none';
+  // DELIVERIES: Calendar + Filters + Form (NO TABLE)
+  if (pageName === 'deliveries') {
+    if (mainContent) mainContent.classList.add('deliveries-layout');
+    if (filterSection) filterSection.style.display = 'block';
+    if (calendarSection) calendarSection.style.display = 'block';
+    if (formSection) formSection.style.display = 'block';
+  }
+
+  // RECORDS: Just the table with export/print buttons
+  if (pageName === 'records') {
+    if (filterSection) filterSection.style.display = 'block';
+    if (tableSection) tableSection.style.display = 'block';
+  }
 
   // COMPANIES: Company list
   if (pageName === 'companies') {
-    if (filterSection) filterSection.style.display = 'none';
-    if (calendarSection) calendarSection.style.display = 'none';
     if (formSection) formSection.style.display = 'block';
-    if (tableSection) tableSection.style.display = 'none';
     showCompanyList();
   }
 
