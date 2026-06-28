@@ -1257,6 +1257,11 @@ function switchPage(pageName) {
     showBillingPage();
   }
 
+  // SETTINGS: Open settings modal
+  if (pageName === 'settings') {
+    openSettingsModal();
+  }
+
   console.log('Switched to page:', pageName);
 }
 
