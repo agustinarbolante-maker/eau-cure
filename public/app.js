@@ -91,6 +91,9 @@ closeAddCompanyModalBtn.addEventListener('click', closeAddCompanyModal);
 closeAddCompanyModal2Btn.addEventListener('click', closeAddCompanyModal);
 printBillingBtn.addEventListener('click', printBillingStatement);
 downloadBillingPdfBtn.addEventListener('click', downloadBillingPdf);
+billingCompanySelect.addEventListener('change', generateBillingStatement);
+billingStartDateInput.addEventListener('change', generateBillingStatement);
+billingEndDateInput.addEventListener('change', generateBillingStatement);
 
 async function fetchCompanies() {
   try {
