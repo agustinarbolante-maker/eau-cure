@@ -3,31 +3,103 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>??</title>
+  <title>Eau Cure - Water Station Delivery Tracker</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body class="password-page scary">
-  <!-- Scary background effect -->
-  <div class="glitch-text" id="glitch">_ _ _</div>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>Eau Cure - Water Station Delivery Tracker</h1>
+      <p>Track and manage all water deliveries</p>
+    </header>
 
-  <div class="password-container">
-    <div class="skull">💀</div>
-    <form id="password-form" class="password-form">
-      <input
-        type="password"
-        id="password-input"
-        placeholder="ACCESS CODE"
-        required
-      >
-      <button type="submit" class="password-button scary-btn">ENTER</button>
-    </form>
+    <main class="main-content">
+      <section class="form-section">
+        <h2>New Delivery Entry</h2>
+        <form id="deliveryForm">
+          <div class="form-group">
+            <label for="company">Company Delivered:</label>
+            <input type="text" id="company" name="company" required>
+          </div>
 
-    <p id="error-message" class="error-message"></p>
-    <p class="scary-text">WHO DARES ENTER?</p>
-    <p class="encouragement">You got this Jodi! 💪</p>
-    <p class="no-cheat">no cheating pls! 👀</p>
+          <div class="form-group">
+            <label for="bottlesDelivered">Number of Bottles Delivered:</label>
+            <input type="number" id="bottlesDelivered" name="bottlesDelivered" min="0" required>
+          </div>
+
+          <div class="form-group">
+            <label for="bottlesReturned">Number of Bottles Returned:</label>
+            <input type="number" id="bottlesReturned" name="bottlesReturned" min="0" required>
+          </div>
+
+          <div class="form-group">
+            <label for="drNumber">DR Number:</label>
+            <input type="text" id="drNumber" name="drNumber" required>
+          </div>
+
+          <button type="submit" class="btn btn-submit">Add Delivery</button>
+        </form>
+        <div id="formMessage" class="form-message"></div>
+      </section>
+
+      <section class="table-section">
+        <h2>Delivery Records</h2>
+        <div class="table-wrapper">
+          <table id="deliveriesTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Company</th>
+                <th>Bottles Delivered</th>
+                <th>Bottles Returned</th>
+                <th>DR Number</th>
+                <th>Timestamp</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <tr class="empty-state">
+                <td colspan="7">No deliveries recorded yet</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
   </div>
 
-  <script src="password.js"></script>
+  <div id="editModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit Delivery</h2>
+        <button type="button" class="modal-close" id="closeModal">&times;</button>
+      </div>
+      <form id="editForm">
+        <input type="hidden" id="editId">
+        <div class="form-group">
+          <label for="editCompany">Company Delivered:</label>
+          <input type="text" id="editCompany" required>
+        </div>
+        <div class="form-group">
+          <label for="editBottlesDelivered">Number of Bottles Delivered:</label>
+          <input type="number" id="editBottlesDelivered" min="0" required>
+        </div>
+        <div class="form-group">
+          <label for="editBottlesReturned">Number of Bottles Returned:</label>
+          <input type="number" id="editBottlesReturned" min="0" required>
+        </div>
+        <div class="form-group">
+          <label for="editDrNumber">DR Number:</label>
+          <input type="text" id="editDrNumber" required>
+        </div>
+        <div class="modal-buttons">
+          <button type="button" class="btn btn-cancel" id="cancelEdit">Cancel</button>
+          <button type="submit" class="btn btn-submit">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>

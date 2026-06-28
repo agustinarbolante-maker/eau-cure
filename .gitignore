@@ -1,11 +1,9 @@
 node_modules/
+data/water_station.db
 .env
-.env.local
-dist/
-build/
 .DS_Store
 *.log
-.vite/
-.claude/
-AlwaysBeMine/
-timeless-love-anniversary-app/
+dist/
+build/
+.vscode/
+.idea/

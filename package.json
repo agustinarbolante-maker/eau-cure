@@ -1,20 +1,19 @@
 {
-  "name": "love-letter-app",
-  "type": "module",
+  "name": "eau-cure-water-station",
   "version": "1.0.0",
+  "description": "Water station delivery tracking database",
+  "main": "server.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
+  "keywords": ["water", "station", "delivery", "tracking"],
+  "author": "",
+  "license": "MIT",
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "framer-motion": "^10.16.4",
-    "axios": "^1.6.0"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^4.0.0",
-    "vite": "^4.4.5"
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
   }
 }
