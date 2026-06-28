@@ -1314,8 +1314,30 @@ function switchDashboardTab(tabName) {
   console.log('Switched to tab:', tabName);
 }
 
+// Initialize page to show dashboard by default
+function initPage() {
+  const mainContent = document.querySelector('.main-content');
+  if (mainContent) {
+    mainContent.classList.remove('deliveries-layout');
+  }
+
+  const dashboardSection = document.getElementById('dashboardSection');
+  const filterSection = document.querySelector('.filter-section');
+  const calendarSection = document.querySelector('.calendar-section');
+  const formSection = document.querySelector('.form-section');
+  const tableSection = document.querySelector('.table-section');
+
+  if (dashboardSection) dashboardSection.style.display = 'block';
+  if (filterSection) filterSection.style.display = 'none';
+  if (calendarSection) calendarSection.style.display = 'none';
+  if (formSection) formSection.style.display = 'none';
+  if (tableSection) tableSection.style.display = 'none';
+}
+
 const today = new Date();
 const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+initPage();
 selectDateFromCalendar(todayStr);
 
 fetchCompanies();
