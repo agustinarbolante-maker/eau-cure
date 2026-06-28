@@ -771,31 +771,81 @@ function downloadBillingPdf() {
   const company = billingCompanySelect.value;
   const startDate = billingStartDateInput.value;
   const endDate = billingEndDateInput.value;
-  const content = billingContent.innerHTML;
+
+  // Extract data from the current billing statement
+  const titleEl = billingContent.querySelector('h3');
+  const infoEls = billingContent.querySelectorAll('div > p');
+  const tableEl = billingContent.querySelector('table');
+  const summaryEl = billingContent.querySelector('.billing-summary');
+
+  let infoHtml = '';
+  infoEls.forEach(el => {
+    infoHtml += `<p>${el.textContent}</p>`;
+  });
+
+  let tableHtml = tableEl.outerHTML;
+  let summaryHtml = '';
+
+  if (summaryEl) {
+    summaryEl.querySelectorAll('.billing-summary-row').forEach((row, idx) => {
+      const isTotal = row.classList.contains('total');
+      const rowText = row.textContent;
+      const [label, value] = rowText.split(/(?<=:)\s*/);
+
+      if (isTotal) {
+        summaryHtml += `<div style="font-weight: bold; font-size: 16px; border-top: 2px solid #000; padding-top: 15px; padding: 10px 0; display: flex; justify-content: space-between;">
+          <span>${label}</span>
+          <span style="color: #667eea;">${value}</span>
+        </div>`;
+      } else {
+        summaryHtml += `<div style="padding: 10px 0; display: flex; justify-content: space-between;">
+          <span>${label}</span>
+          <span style="${label.includes('Bottle') ? 'color: #667eea;' : ''}color: #000;">${value}</span>
+        </div>`;
+      }
+    });
+  }
 
   const htmlContent = `
     <!DOCTYPE html>
     <html>
     <head>
       <title>Billing Statement - ${company}</title>
+      <meta charset="UTF-8">
       <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        h3 { text-align: center; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background: #667eea; color: white; }
-        .billing-summary { background: #f8f9fa; padding: 20px; border-radius: 8px; }
-        .billing-summary-row { display: flex; justify-content: space-between; padding: 10px 0; }
-        .billing-summary-row.total { font-weight: bold; font-size: 16px; border-top: 2px solid #667eea; padding-top: 15px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; padding: 40px 20px; color: #000; }
+        h3 { text-align: center; margin-bottom: 30px; font-size: 24px; color: #667eea; font-weight: bold; }
+        .info { margin-bottom: 20px; font-size: 13px; line-height: 1.6; }
+        .info p { margin-bottom: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; font-size: 12px; }
+        th { background: #f0f0f0; border: 1px solid #000; padding: 8px; text-align: left; font-weight: bold; color: #000; }
+        td { border: 1px solid #000; padding: 8px; color: #000; }
+        .billing-summary { margin-top: 20px; }
+        .billing-summary > div { padding: 10px 0; display: flex; justify-content: space-between; font-size: 13px; }
+        .billing-summary > div:last-child { border-top: 2px solid #000; padding-top: 15px; font-weight: bold; font-size: 14px; }
+        .billing-summary > div:last-child span:last-child { color: #667eea; font-size: 16px; }
+        @media print {
+          body { padding: 20px; }
+          h3 { page-break-after: avoid; }
+          table { page-break-inside: avoid; }
+        }
       </style>
     </head>
     <body>
-      ${content}
+      <h3>BILLING STATEMENT</h3>
+      <div class="info">
+        ${infoHtml}
+      </div>
+      ${tableHtml}
+      <div class="billing-summary">
+        ${summaryHtml}
+      </div>
     </body>
     </html>
   `;
 
-  const blob = new Blob([htmlContent], { type: 'text/html' });
+  const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;

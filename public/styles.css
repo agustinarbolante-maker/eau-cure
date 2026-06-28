@@ -1166,6 +1166,107 @@ tbody tr:hover {
   th, td {
     padding: 8px 6px;
   }
+}
+
+@media print {
+  body {
+    background: white;
+    padding: 20px;
+  }
+
+  .container {
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  .header,
+  .main-content,
+  .dashboard-section,
+  .filter-section,
+  .calendar-section,
+  .form-section {
+    display: none !important;
+  }
+
+  .billing-content {
+    display: block !important;
+    padding: 0;
+    max-height: none;
+  }
+
+  .billing-content h3 {
+    text-align: center;
+    margin: 20px 0 30px 0;
+    font-size: 24px;
+    color: #667eea;
+    font-weight: bold;
+  }
+
+  .billing-content div > p {
+    margin-bottom: 5px;
+    font-size: 13px;
+    color: #000;
+  }
+
+  .billing-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 12px;
+  }
+
+  .billing-table th {
+    background: #f0f0f0 !important;
+    border: 1px solid #000 !important;
+    padding: 8px !important;
+    text-align: left;
+    font-weight: bold;
+    color: #000 !important;
+  }
+
+  .billing-table td {
+    border: 1px solid #000 !important;
+    padding: 8px !important;
+    color: #000 !important;
+    background: white !important;
+  }
+
+  .billing-summary {
+    margin-top: 20px;
+    padding: 0;
+    background: white !important;
+    border: none !important;
+  }
+
+  .billing-summary-row {
+    padding: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #000;
+    background: white !important;
+    border: none !important;
+  }
+
+  .billing-summary-row.total {
+    border-top: 2px solid #000 !important;
+    padding-top: 15px;
+    font-weight: bold;
+    font-size: 14px;
+    color: #000;
+  }
+
+  .billing-summary-row.total span:last-child {
+    color: #667eea !important;
+    font-size: 16px;
+  }
+
+  .modal-buttons,
+  #printBillingBtn,
+  #downloadBillingPdfBtn,
+  #closeBillingModal2 {
+    display: none !important;
+  }
 
   .modal-content {
     width: 95%;
