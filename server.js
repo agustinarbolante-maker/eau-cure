@@ -70,10 +70,69 @@ app.delete('/api/deliveries/:id', async (req, res) => {
   }
 });
 
+app.get('/api/backups', async (req, res) => {
+  try {
+    const backups = await db.listBackups();
+    res.json(backups);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/backups', async (req, res) => {
+  try {
+    const result = await db.performBackup();
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/backups/restore/:filename', async (req, res) => {
+  try {
+    const { filename } = req.params;
+    const result = await db.restoreBackup(filename);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/backups/download/:filename', (req, res) => {
+  try {
+    const { filename } = req.params;
+    const backupPath = path.join(__dirname, 'data', 'backups', filename);
+
+    if (!filename.startsWith('backup_') || !filename.endsWith('.db')) {
+      return res.status(400).json({ error: 'Invalid filename' });
+    }
+
+    if (!require('fs').existsSync(backupPath)) {
+      return res.status(404).json({ error: 'Backup not found' });
+    }
+
+    res.download(backupPath);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 async function start() {
   try {
     await db.initDB();
     console.log('Database initialized');
+
+    await db.performBackup();
+    console.log('Initial backup created');
+
+    setInterval(async () => {
+      try {
+        await db.performBackup();
+      } catch (err) {
+        console.error('Scheduled backup failed:', err);
+      }
+    }, 24 * 60 * 60 * 1000);
+
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
     });

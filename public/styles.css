@@ -62,6 +62,18 @@ body {
   padding-bottom: 10px;
 }
 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-header h2 {
+  margin: 0;
+  flex: 1;
+}
+
 .form-group {
   margin-bottom: 15px;
 }
@@ -148,6 +160,106 @@ body {
 
 .btn-cancel:hover {
   background: #5a6268;
+}
+
+.btn-backup {
+  background: #28a745;
+  color: white;
+  padding: 8px 12px;
+  font-size: 12px;
+  margin-left: 10px;
+}
+
+.btn-backup:hover {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
+.btn-small {
+  padding: 4px 8px;
+  font-size: 11px;
+  margin-right: 5px;
+}
+
+.btn-restore {
+  background: #17a2b8;
+  color: white;
+}
+
+.btn-restore:hover {
+  background: #138496;
+}
+
+.btn-download {
+  background: #007bff;
+  color: white;
+}
+
+.btn-download:hover {
+  background: #0056b3;
+}
+
+.backup-content {
+  margin-bottom: 20px;
+}
+
+.backup-content h3 {
+  color: #667eea;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.backup-list {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #e9ecef;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.backup-item {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  padding: 12px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.backup-info {
+  flex: 1;
+  font-size: 13px;
+}
+
+.backup-info strong {
+  color: #333;
+}
+
+.backup-info small {
+  color: #666;
+}
+
+.backup-actions {
+  display: flex;
+  gap: 5px;
+  margin-left: 10px;
+}
+
+.loading {
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  padding: 20px;
+}
+
+.error {
+  color: #dc3545;
+  padding: 10px;
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 3px;
 }
 
 .form-message {

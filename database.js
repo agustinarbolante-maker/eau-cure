@@ -1,7 +1,10 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const fs = require('fs');
 
 const DB_PATH = path.join(__dirname, 'data', 'water_station.db');
+const BACKUP_DIR = path.join(__dirname, 'data', 'backups');
+const BACKUP_RETENTION_DAYS = 30;
 
 let db;
 
@@ -95,11 +98,113 @@ function getCompanies() {
   return COMPANIES;
 }
 
+function createBackupDirectory() {
+  if (!fs.existsSync(BACKUP_DIR)) {
+    fs.mkdirSync(BACKUP_DIR, { recursive: true });
+  }
+}
+
+function performBackup() {
+  return new Promise((resolve, reject) => {
+    try {
+      createBackupDirectory();
+
+      if (!fs.existsSync(DB_PATH)) {
+        resolve({ success: false, message: 'Database file not found' });
+        return;
+      }
+
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+      const backupFilename = `backup_${timestamp}.db`;
+      const backupPath = path.join(BACKUP_DIR, backupFilename);
+
+      fs.copyFileSync(DB_PATH, backupPath);
+      cleanOldBackups();
+
+      console.log(`Backup created: ${backupFilename}`);
+      resolve({ success: true, filename: backupFilename, timestamp });
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+function cleanOldBackups() {
+  try {
+    const files = fs.readdirSync(BACKUP_DIR);
+    const now = Date.now();
+    const maxAge = BACKUP_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+
+    files.forEach(file => {
+      const filePath = path.join(BACKUP_DIR, file);
+      const stat = fs.statSync(filePath);
+      const age = now - stat.mtime.getTime();
+
+      if (age > maxAge) {
+        fs.unlinkSync(filePath);
+        console.log(`Deleted old backup: ${file}`);
+      }
+    });
+  } catch (err) {
+    console.error('Error cleaning old backups:', err);
+  }
+}
+
+function listBackups() {
+  return new Promise((resolve, reject) => {
+    try {
+      createBackupDirectory();
+      const files = fs.readdirSync(BACKUP_DIR);
+      const backups = files
+        .filter(f => f.startsWith('backup_') && f.endsWith('.db'))
+        .map(f => {
+          const filePath = path.join(BACKUP_DIR, f);
+          const stat = fs.statSync(filePath);
+          return {
+            filename: f,
+            created: stat.mtime.toISOString(),
+            size: stat.size
+          };
+        })
+        .sort((a, b) => new Date(b.created) - new Date(a.created));
+
+      resolve(backups);
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+function restoreBackup(backupFilename) {
+  return new Promise((resolve, reject) => {
+    try {
+      const backupPath = path.join(BACKUP_DIR, backupFilename);
+
+      if (!fs.existsSync(backupPath)) {
+        throw new Error('Backup file not found');
+      }
+
+      if (!backupFilename.startsWith('backup_') || !backupFilename.endsWith('.db')) {
+        throw new Error('Invalid backup filename');
+      }
+
+      fs.copyFileSync(backupPath, DB_PATH);
+      console.log(`Database restored from: ${backupFilename}`);
+      resolve({ success: true, message: 'Database restored successfully' });
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
 module.exports = {
   initDB,
   getAllDeliveries,
   addDelivery,
   updateDelivery,
   deleteDelivery,
-  getCompanies
+  getCompanies,
+  performBackup,
+  listBackups,
+  restoreBackup
 };

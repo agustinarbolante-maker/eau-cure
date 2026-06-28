@@ -13,11 +13,21 @@ const closeModalBtn = document.getElementById('closeModal');
 const cancelEditBtn = document.getElementById('cancelEdit');
 const companySelect = document.getElementById('company');
 const editCompanySelect = document.getElementById('editCompany');
+const backupBtn = document.getElementById('backupBtn');
+const backupModal = document.getElementById('backupModal');
+const closeBackupModalBtn = document.getElementById('closeBackupModal');
+const closeBackupModal2Btn = document.getElementById('closeBackupModal2');
+const manualBackupBtn = document.getElementById('manualBackupBtn');
+const backupList = document.getElementById('backupList');
 
 deliveryForm.addEventListener('submit', handleFormSubmit);
 editForm.addEventListener('submit', handleEditSubmit);
 closeModalBtn.addEventListener('click', closeEditModal);
 cancelEditBtn.addEventListener('click', closeEditModal);
+backupBtn.addEventListener('click', openBackupModal);
+closeBackupModalBtn.addEventListener('click', closeBackupModal);
+closeBackupModal2Btn.addEventListener('click', closeBackupModal);
+manualBackupBtn.addEventListener('click', createManualBackup);
 
 async function fetchCompanies() {
   try {
@@ -165,6 +175,93 @@ function showMessage(msg, type) {
   setTimeout(() => {
     formMessage.classList.remove('show');
   }, 3000);
+}
+
+function openBackupModal() {
+  backupModal.classList.remove('hidden');
+  loadBackupList();
+}
+
+function closeBackupModal() {
+  backupModal.classList.add('hidden');
+}
+
+async function loadBackupList() {
+  try {
+    backupList.innerHTML = '<p class="loading">Loading backups...</p>';
+    const response = await fetch('/api/backups');
+    if (!response.ok) throw new Error('Failed to load backups');
+    const backups = await response.json();
+
+    if (backups.length === 0) {
+      backupList.innerHTML = '<p class="loading">No backups yet. Automatic backups run daily.</p>';
+      return;
+    }
+
+    backupList.innerHTML = backups.map(backup => {
+      const date = new Date(backup.created).toLocaleString();
+      const sizeMB = (backup.size / 1024 / 1024).toFixed(2);
+      return `
+        <div class="backup-item">
+          <div class="backup-info">
+            <strong>${backup.filename}</strong>
+            <br>
+            <small>Created: ${date}</small>
+            <br>
+            <small>Size: ${sizeMB} MB</small>
+          </div>
+          <div class="backup-actions">
+            <button class="btn btn-small btn-restore" onclick="restoreBackup('${backup.filename}')">Restore</button>
+            <button class="btn btn-small btn-download" onclick="downloadBackup('${backup.filename}')">Download</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (err) {
+    backupList.innerHTML = `<p class="error">Error loading backups: ${err.message}</p>`;
+  }
+}
+
+async function createManualBackup() {
+  try {
+    manualBackupBtn.disabled = true;
+    manualBackupBtn.textContent = 'Creating...';
+
+    const response = await fetch('/api/backups', { method: 'POST' });
+    if (!response.ok) throw new Error('Failed to create backup');
+
+    const result = await response.json();
+    showMessage('Backup created successfully!', 'success');
+    loadBackupList();
+  } catch (err) {
+    showMessage('Error creating backup: ' + err.message, 'error');
+  } finally {
+    manualBackupBtn.disabled = false;
+    manualBackupBtn.textContent = 'Create Backup Now';
+  }
+}
+
+async function restoreBackup(filename) {
+  if (!confirm('⚠️ WARNING: This will replace your current data with the backup. Are you sure?')) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/backups/restore/${filename}`, { method: 'POST' });
+    if (!response.ok) throw new Error('Failed to restore backup');
+
+    showMessage('✅ Database restored successfully! Reloading data...', 'success');
+    setTimeout(() => {
+      fetchDeliveries();
+      loadBackupList();
+    }, 1000);
+  } catch (err) {
+    showMessage('Error restoring backup: ' + err.message, 'error');
+  }
+}
+
+function downloadBackup(filename) {
+  window.location.href = `/api/backups/download/${filename}`;
 }
 
 fetchCompanies();

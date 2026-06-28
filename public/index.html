@@ -45,7 +45,10 @@
       </section>
 
       <section class="table-section">
-        <h2>Delivery Records</h2>
+        <div class="section-header">
+          <h2>Delivery Records</h2>
+          <button type="button" class="btn btn-backup" id="backupBtn" title="Create manual backup">💾 Backup</button>
+        </div>
         <div class="table-wrapper">
           <table id="deliveriesTable">
             <thead>
@@ -68,6 +71,25 @@
         </div>
       </section>
     </main>
+  </div>
+
+  <div id="backupModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Backup Management</h2>
+        <button type="button" class="modal-close" id="closeBackupModal">&times;</button>
+      </div>
+      <div class="backup-content">
+        <h3>Available Backups</h3>
+        <div id="backupList" class="backup-list">
+          <p class="loading">Loading backups...</p>
+        </div>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn btn-submit" id="manualBackupBtn">Create Backup Now</button>
+        <button type="button" class="btn btn-cancel" id="closeBackupModal2">Close</button>
+      </div>
+    </div>
   </div>
 
   <div id="editModal" class="modal hidden">
