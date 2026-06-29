@@ -5,7 +5,7 @@
   "main": "main.js",
   "homepage": "./",
   "scripts": {
-    "start": "electron .",
+    "start": "node server.js",
     "dev": "electron .",
     "server": "node server.js",
     "build": "electron-builder"
