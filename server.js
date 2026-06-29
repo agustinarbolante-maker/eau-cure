@@ -2,14 +2,28 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
+const http = require('http');
+const { Server } = require('socket.io');
 const db = require('./database');
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: { origin: '*', methods: ['GET', 'POST'] }
+});
+
 const PORT = 3000;
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+io.on('connection', (socket) => {
+  console.log(`User connected: ${socket.id}`);
+  socket.on('disconnect', () => {
+    console.log(`User disconnected: ${socket.id}`);
+  });
+});
 
 app.get('/api/companies', async (req, res) => {
   try {
@@ -36,6 +50,8 @@ app.post('/api/companies', async (req, res) => {
       return res.status(400).json({ error: 'Name and unit price are required' });
     }
     const id = await db.addCompany(name, unitPrice);
+    const companies = await db.getAllCompaniesFromDB();
+    io.emit('companies_updated', companies);
     res.json({ id, name, unitPrice, message: 'Company added successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -156,6 +172,8 @@ app.post('/api/deliveries', async (req, res) => {
     }
 
     const id = await db.addDelivery(company, bottlesDelivered, bottlesReturned, drNumber, timestamp);
+    const deliveries = await db.getAllDeliveries();
+    io.emit('deliveries_updated', deliveries);
     res.json({ id, message: 'Delivery added successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -166,12 +184,14 @@ app.put('/api/deliveries/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { company, bottlesDelivered, bottlesReturned, drNumber } = req.body;
-    
+
     if (!company || bottlesDelivered === undefined || bottlesReturned === undefined || !drNumber) {
       return res.status(400).json({ error: 'All fields are required' });
     }
-    
+
     await db.updateDelivery(id, company, bottlesDelivered, bottlesReturned, drNumber);
+    const deliveries = await db.getAllDeliveries();
+    io.emit('deliveries_updated', deliveries);
     res.json({ message: 'Delivery updated successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -182,6 +202,8 @@ app.delete('/api/deliveries/:id', async (req, res) => {
   try {
     const { id } = req.params;
     await db.deleteDelivery(id);
+    const deliveries = await db.getAllDeliveries();
+    io.emit('deliveries_updated', deliveries);
     res.json({ message: 'Delivery deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -282,7 +304,7 @@ async function start() {
       }
     }, 24 * 60 * 60 * 1000);
 
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
     });
   } catch (err) {

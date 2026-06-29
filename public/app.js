@@ -4,6 +4,32 @@ let deliveries = [];
 let companies = [];
 let editingId = null;
 
+const socket = io();
+socket.on('connect', () => {
+  console.log('Connected to server');
+});
+socket.on('deliveries_updated', (updatedDeliveries) => {
+  console.log('Deliveries updated from server');
+  deliveries = updatedDeliveries;
+  for (const key in deliveryCountByDate) {
+    delete deliveryCountByDate[key];
+  }
+  deliveries.forEach(delivery => {
+    const deliveryDate = new Date(delivery.timestamp);
+    const dateStr = `${deliveryDate.getFullYear()}-${String(deliveryDate.getMonth() + 1).padStart(2, '0')}-${String(deliveryDate.getDate()).padStart(2, '0')}`;
+    deliveryCountByDate[dateStr] = (deliveryCountByDate[dateStr] || 0) + 1;
+  });
+  renderTable();
+  renderCalendar();
+  updateStats();
+  renderDeliveryChart();
+});
+socket.on('companies_updated', (updatedCompanies) => {
+  console.log('Companies updated from server');
+  companies = updatedCompanies;
+  populateCompanyDropdowns();
+});
+
 const deliveryForm = document.getElementById('deliveryForm');
 const tableBody = document.getElementById('tableBody');
 const formMessage = document.getElementById('formMessage');
